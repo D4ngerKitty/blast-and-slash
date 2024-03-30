@@ -4389,7 +4389,7 @@ function changelog () {
             .cccccccccccccccccccccc.
             `)
         game.setDialogTextColor(9)
-        game.showLongText("This is the first reless of blast and slash of the female game jam. you can find one boss and up to 8 different upgrades. with 7 different enemies.    If you want to play to non gamejam verson its up on gethub at D4ngerKitty/blast-and-slash", DialogLayout.Center)
+        game.showLongText("This is the first reless of blast and slash of the female game jam. you can find one boss and up to 8 different upgrades. with 7 different enemies.    If you want to play to non gamejam verson its up on gethub at d4ngerkitty/blast-and-slash", DialogLayout.Center)
     }
 }
 sprites.onDestroyed(SpriteKind.Projectile, function (sprite) {
@@ -4454,13 +4454,13 @@ function loadlevels () {
     levelsdisplay.setPosition(30, 230)
     levelsdisplay.setKind(SpriteKind.allevels)
     if (sprites.readDataNumber(hitbox, "levels-in") == 20) {
-        BossStart()
+        tiles.setCurrentTilemap(tilemap`level54`)
     } else {
         tiles.setCurrentTilemap(tileUtil.cloneMap(dessertlevels[randint(0, 4)]))
     }
+    sprites.destroyAllSpritesOfKind(SpriteKind.Enemy)
     sprites.destroyAllSpritesOfKind(SpriteKind.text)
     sprites.destroyAllSpritesOfKind(SpriteKind.camra)
-    sprites.destroyAllSpritesOfKind(SpriteKind.Enemy)
     sprites.destroyAllSpritesOfKind(SpriteKind.background)
     sprites.destroyAllSpritesOfKind(SpriteKind.gold)
     sprites.destroyAllSpritesOfKind(SpriteKind.heal)
@@ -4473,6 +4473,9 @@ function loadlevels () {
     Zoom.SetZoomFilter(1, Mode.Center)
     turaningen()
     sprites.setDataBoolean(hitbox, "Inlevel", true)
+    if (sprites.readDataNumber(hitbox, "levels-in") == 20) {
+        BossStart()
+    }
 }
 function shoot (num: number, num2: number) {
     music.play(music.createSoundEffect(WaveShape.Square, 2040, 1, 130, 0, 200, SoundExpressionEffect.None, InterpolationCurve.Curve), music.PlaybackMode.InBackground)
@@ -5214,6 +5217,8 @@ controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
                         inhubworld = false
                         sprites.setDataNumber(hitbox, "levelsdoing", 20)
                         sprites.setDataNumber(hitbox, "levels-in", 18)
+                        sprites.destroyAllSpritesOfKind(SpriteKind.text)
+                        sprites.destroy(textSprite)
                         levelsdisplay = textsprite.create("" + convertToText(sprites.readDataNumber(hitbox, "levelsdoing")) + "/" + convertToText(sprites.readDataNumber(hitbox, "levels-in")))
                         levelsdisplay.setScale(2, ScaleAnchor.Middle)
                         levelsdisplay.setFlag(SpriteFlag.RelativeToCamera, true)
@@ -5266,7 +5271,6 @@ function BossStart () {
     playtrack = 0
     music.stopAllSounds()
     playtrack = 3
-    tiles.setCurrentTilemap(tilemap`level54`)
     Boss = sprites.create(img`
         .............eeeeee.............
         ............e444444e............
@@ -5480,17 +5484,18 @@ function BossStart () {
     100,
     characterAnimations.rule(Predicate.MovingRight)
     )
-    tileUtil.replaceAllTiles(assets.tile`myTile12`, assets.tile`transparency16`)
     Boss.ay = 200
-    statusbar = statusbars.create(20, 4, StatusBarKind.EnemyHealth)
+    statusbar = statusbars.create(40, 4, StatusBarKind.EnemyHealth)
     statusbar.setColor(2, 12, 4)
     statusbar.setStatusBarFlag(StatusBarFlag.SmoothTransition, true)
-    statusbar.attachToSprite(Boss, 0, 0)
+    statusbar.attachToSprite(Boss, 3, 0)
     statusbar.value = 50
     statusbar.max = 50
+    statusbar.setLabel("Bandit")
     sprites.setDataNumber(Boss, "Lootchance", 91)
     sprites.setDataNumber(Boss, "enemy", 101)
     sprites.setDataBoolean(Boss, "leftright", false)
+    tileUtil.replaceAllTiles(assets.tile`myTile12`, assets.tile`transparency16`)
 }
 statusbars.onZero(StatusBarKind.EnemyHealth, function (status) {
     sprites.destroy(status.spriteAttachedTo())
@@ -6178,11 +6183,6 @@ forever(function () {
                 projectile2.z = 0
             })
         }
-    }
-})
-game.onUpdate(function () {
-    if (in_menus) {
-        Zoom.SetZoomFilter(2, Mode.Right)
     }
 })
 forever(function () {
@@ -8596,6 +8596,11 @@ forever(function () {
             }
             sprites.setDataBoolean(value, "amation", false)
         }
+    }
+})
+game.onUpdate(function () {
+    if (in_menus) {
+        Zoom.SetZoomFilter(2, Mode.Right)
     }
 })
 forever(function () {
