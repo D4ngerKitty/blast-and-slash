@@ -4467,7 +4467,7 @@ function loadlevels () {
     levelsdisplay.setFlag(SpriteFlag.RelativeToCamera, true)
     levelsdisplay.setPosition(30, 230)
     levelsdisplay.setKind(SpriteKind.allevels)
-    if (sprites.readDataNumber(hitbox, "levels-in") == 1) {
+    if (sprites.readDataNumber(hitbox, "levels-in") == 20) {
         tiles.setCurrentTilemap(tilemap`level54`)
     } else {
         tiles.setCurrentTilemap(tileUtil.cloneMap(dessertlevels[randint(0, 4)]))
@@ -4487,7 +4487,7 @@ function loadlevels () {
     Zoom.SetZoomFilter(1, Mode.Center)
     turaningen()
     sprites.setDataBoolean(hitbox, "Inlevel", true)
-    if (sprites.readDataNumber(hitbox, "levels-in") == 1) {
+    if (sprites.readDataNumber(hitbox, "levels-in") == 20) {
         BossStart()
     }
 }
@@ -5034,6 +5034,80 @@ function blasterloading () {
         ................................
         `]
 }
+sprites.onDestroyed(SpriteKind.Enemy, function (sprite) {
+    if (sprites.readDataNumber(sprite, "enemy") == 101) {
+        timer.background(function () {
+            game.setGameOverEffect(true, effects.confetti)
+            game.setGameOverMessage(true, "Thanks for playing more coming soon!!")
+        })
+    } else {
+        if (sprites.readDataBoolean(hitbox, "Inlevel")) {
+            if (Math.percentChance(10)) {
+                dropgoldheals("Chest", sprite, 3)
+            }
+            for (let index = 0; index < 1 + sprites.readDataNumber(hitbox, "More-Gold-drops"); index++) {
+                if (sprites.readDataNumber(sprite, "Lootchance") == 1) {
+                    if (Math.percentChance(50)) {
+                        dropgoldheals("gold", sprite, 1)
+                    }
+                    if (Math.percentChance(30)) {
+                        dropgoldheals("gold", sprite, 2)
+                    }
+                } else if (sprites.readDataNumber(sprite, "Lootchance") == 2) {
+                    if (Math.percentChance(70)) {
+                        dropgoldheals("gold", sprite, 1)
+                    }
+                    if (Math.percentChance(50)) {
+                        dropgoldheals("gold", sprite, 2)
+                    }
+                } else if (sprites.readDataNumber(sprite, "Lootchance") == 5) {
+                    if (Math.percentChance(70)) {
+                        dropgoldheals("gold", sprite, 2)
+                    }
+                    if (Math.percentChance(50)) {
+                        dropgoldheals("gold", sprite, 3)
+                    }
+                } else if (sprites.readDataNumber(sprite, "Lootchance") == 10) {
+                    for (let index = 0; index < 2; index++) {
+                        if (Math.percentChance(70)) {
+                            dropgoldheals("gold", sprite, 2)
+                        }
+                        if (Math.percentChance(50)) {
+                            dropgoldheals("gold", sprite, 3)
+                        }
+                        if (Math.percentChance(20)) {
+                            dropgoldheals("Heal", sprite, 1)
+                        }
+                    }
+                }
+            }
+            for (let index = 0; index < sprites.readDataNumber(hitbox, "enemies-drop-more-HP"); index++) {
+                if (sprites.readDataNumber(sprite, "Lootchance") == 1) {
+                    if (Math.percentChance(20)) {
+                        dropgoldheals("Heal", sprite, 1)
+                    }
+                    if (Math.percentChance(5)) {
+                        dropgoldheals("Heal", sprite, 2)
+                    }
+                } else if (sprites.readDataNumber(sprite, "Lootchance") == 2) {
+                    if (Math.percentChance(20)) {
+                        dropgoldheals("Heal", sprite, 1)
+                    }
+                    if (Math.percentChance(5)) {
+                        dropgoldheals("Heal", sprite, 2)
+                    }
+                } else if (sprites.readDataNumber(sprite, "Lootchance") == 5) {
+                    if (Math.percentChance(20)) {
+                        dropgoldheals("Heal", sprite, 2)
+                    }
+                    if (Math.percentChance(5)) {
+                        dropgoldheals("Heal", sprite, 3)
+                    }
+                }
+            }
+        }
+    }
+})
 scene.onHitWall(SpriteKind.Projectile, function (sprite, location) {
     if (tiles.tileAtLocationEquals(location, assets.tile`myTile17`)) {
         tiles.setTileAt(location, assets.tile`myTile30`)
@@ -5495,73 +5569,6 @@ sprites.onDestroyed(SpriteKind.Emprject, function (sprite) {
         }
     }
 })
-sprites.onDestroyed(SpriteKind.Enemy, function (sprite) {
-    if (sprites.readDataNumber(sprite, "enemy") == 101) {
-        timer.background(function () {
-            game.setGameOverEffect(true, effects.confetti)
-            game.setGameOverMessage(true, "Thanks for playing more coming soon!!")
-        })
-    } else {
-        if (sprites.readDataBoolean(hitbox, "Inlevel")) {
-            if (Math.percentChance(10)) {
-                dropgoldheals("Chest", sprite, 3)
-            }
-            for (let index = 0; index < 1 + sprites.readDataNumber(hitbox, "More-Gold-drops"); index++) {
-                if (sprites.readDataNumber(sprite, "Lootchance") == 1) {
-                    if (Math.percentChance(50)) {
-                        dropgoldheals("gold", sprite, 1)
-                    }
-                    if (Math.percentChance(30)) {
-                        dropgoldheals("gold", sprite, 2)
-                    }
-                } else if (sprites.readDataNumber(sprite, "Lootchance") == 2) {
-                    if (Math.percentChance(70)) {
-                        dropgoldheals("gold", sprite, 1)
-                    }
-                    if (Math.percentChance(50)) {
-                        dropgoldheals("gold", sprite, 2)
-                    }
-                } else if (sprites.readDataNumber(sprite, "Lootchance") == 5) {
-                    if (Math.percentChance(70)) {
-                        dropgoldheals("gold", sprite, 2)
-                    }
-                    if (Math.percentChance(50)) {
-                        dropgoldheals("gold", sprite, 3)
-                    }
-                } else if (sprites.readDataNumber(sprite, "Lootchance") == 10) {
-                    for (let index = 0; index < 2; index++) {
-                        if (Math.percentChance(70)) {
-                            dropgoldheals("gold", sprite, 2)
-                        }
-                        if (Math.percentChance(50)) {
-                            dropgoldheals("gold", sprite, 3)
-                        }
-                        if (Math.percentChance(20)) {
-                            dropgoldheals("Heal", sprite, 1)
-                        }
-                    }
-                }
-            }
-            for (let index = 0; index < sprites.readDataNumber(hitbox, "enemies-drop-more-HP"); index++) {
-                if (sprites.readDataNumber(sprite, "Lootchance") == 1) {
-                    if (Math.percentChance(20)) {
-                        dropgoldheals("Heal", sprite, 1)
-                    }
-                    if (Math.percentChance(5)) {
-                        dropgoldheals("Heal", sprite, 2)
-                    }
-                } else if (sprites.readDataNumber(sprite, "Lootchance") == 2) {
-                    if (Math.percentChance(20)) {
-                        dropgoldheals("Heal", sprite, 1)
-                    }
-                    if (Math.percentChance(5)) {
-                        dropgoldheals("Heal", sprite, 2)
-                    }
-                }
-            }
-        }
-    }
-})
 sprites.onOverlap(SpriteKind.sword, SpriteKind.Enemy, function (sprite, otherSprite) {
     music.play(music.createSoundEffect(WaveShape.Noise, 3181, 600, 123, 0, 100, SoundExpressionEffect.None, InterpolationCurve.Logarithmic), music.PlaybackMode.InBackground)
     statusbars.getStatusBarAttachedTo(StatusBarKind.EnemyHealth, otherSprite).value += -1 - sprites.readDataNumber(hitbox, "sword-attack-up")
@@ -5877,6 +5884,9 @@ let random_gen2: tiles.TileMapData[] = []
 let random_gen01: tiles.TileMapData[] = []
 let dessertlevels: tiles.TileMapData[] = []
 let inhubworld = false
+if (true) {
+    blockSettings.clear()
+}
 music.setVolume(50)
 namespace userconfig {
     export const ARCADE_SCREEN_WIDTH = 320
@@ -6150,7 +6160,7 @@ sprites.setDataBoolean(hitbox, "Inlevel", false)
 if (blockSettings.exists("main")) {
     main_lobby()
 }
-if (true) {
+if (false) {
     sprites.setDataNumber(hitbox, "More-slide-speed", 5)
     sprites.setDataNumber(hitbox, "multishot", 5)
     sprites.setDataNumber(hitbox, "homing-blasts", 5)
