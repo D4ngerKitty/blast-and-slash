@@ -3203,6 +3203,7 @@ function load_demo () {
     }
 }
 function upgreads () {
+    sprites.destroyAllSpritesOfKind(SpriteKind.sword)
     inshop = false
     shop = sprites.create(assets.image`shopimage`, SpriteKind.shop)
     shop.z = -1
@@ -3767,6 +3768,7 @@ function turaningen () {
     }
     for (let value of tiles.getTilesByType(assets.tile`myTile66`)) {
         rat = sprites.create(assets.tile`myTile60`, SpriteKind.Enemy)
+        rat.ay = 200
         animation.runImageAnimation(
         rat,
         [img`
@@ -3815,8 +3817,8 @@ function turaningen () {
         statusbar.attachToSprite(rat)
         statusbar.value = 20
         statusbar.max = 20
-        sprites.setDataNumber(rat, "Lootchance", 1)
-        sprites.setDataNumber(rat, "enemy", 4)
+        sprites.setDataNumber(rat, "Lootchance", 10)
+        sprites.setDataNumber(rat, "enemy", 10)
         tiles.setTileAt(value, assets.tile`transparency16`)
         tiles.placeOnTile(rat, value)
     }
@@ -4359,6 +4361,18 @@ function dropgoldheals (GoldHeal: string, mySprite: Sprite, num: number) {
         }
     }
 }
+function Eshoot (num: number, num2: number, num3: number, mySprite: Sprite) {
+    for (let index = 0; index < 1; index++) {
+        projectile2 = sprites.createProjectileFromSprite(img`
+            2 2 
+            2 2 
+            `, mySprite, num, num2)
+        projectile2.z = 0
+        sprites.setDataNumber(projectile2, "color", num3)
+        projectile2.setKind(SpriteKind.Emprject)
+        music.play(music.createSoundEffect(WaveShape.Square, 2040, 1, 130, 0, 200, SoundExpressionEffect.None, InterpolationCurve.Curve), music.PlaybackMode.InBackground)
+    }
+}
 function changelog () {
     story.showPlayerChoices("v.1.0", "back")
     if (story.getLastAnswer() == "v.1.0") {
@@ -4453,7 +4467,7 @@ function loadlevels () {
     levelsdisplay.setFlag(SpriteFlag.RelativeToCamera, true)
     levelsdisplay.setPosition(30, 230)
     levelsdisplay.setKind(SpriteKind.allevels)
-    if (sprites.readDataNumber(hitbox, "levels-in") == 20) {
+    if (sprites.readDataNumber(hitbox, "levels-in") == 1) {
         tiles.setCurrentTilemap(tilemap`level54`)
     } else {
         tiles.setCurrentTilemap(tileUtil.cloneMap(dessertlevels[randint(0, 4)]))
@@ -4473,7 +4487,7 @@ function loadlevels () {
     Zoom.SetZoomFilter(1, Mode.Center)
     turaningen()
     sprites.setDataBoolean(hitbox, "Inlevel", true)
-    if (sprites.readDataNumber(hitbox, "levels-in") == 20) {
+    if (sprites.readDataNumber(hitbox, "levels-in") == 1) {
         BossStart()
     }
 }
@@ -5020,54 +5034,6 @@ function blasterloading () {
         ................................
         `]
 }
-sprites.onDestroyed(SpriteKind.Enemy, function (sprite) {
-    if (sprites.readDataBoolean(hitbox, "Inlevel")) {
-        if (Math.percentChance(10)) {
-            dropgoldheals("Chest", sprite, 3)
-        }
-        for (let index = 0; index < 1 + sprites.readDataNumber(hitbox, "More-Gold-drops"); index++) {
-            if (sprites.readDataNumber(sprite, "Lootchance") == 1) {
-                if (Math.percentChance(50)) {
-                    dropgoldheals("gold", sprite, 1)
-                }
-                if (Math.percentChance(30)) {
-                    dropgoldheals("gold", sprite, 2)
-                }
-            } else if (sprites.readDataNumber(sprite, "Lootchance") == 2) {
-                if (Math.percentChance(70)) {
-                    dropgoldheals("gold", sprite, 1)
-                }
-                if (Math.percentChance(50)) {
-                    dropgoldheals("gold", sprite, 2)
-                }
-            } else if (sprites.readDataNumber(sprite, "Lootchance") == 5) {
-                if (Math.percentChance(70)) {
-                    dropgoldheals("gold", sprite, 2)
-                }
-                if (Math.percentChance(50)) {
-                    dropgoldheals("gold", sprite, 3)
-                }
-            }
-        }
-        for (let index = 0; index < sprites.readDataNumber(hitbox, "enemies-drop-more-HP"); index++) {
-            if (sprites.readDataNumber(sprite, "Lootchance") == 1) {
-                if (Math.percentChance(20)) {
-                    dropgoldheals("Heal", sprite, 1)
-                }
-                if (Math.percentChance(5)) {
-                    dropgoldheals("Heal", sprite, 2)
-                }
-            } else if (sprites.readDataNumber(sprite, "Lootchance") == 2) {
-                if (Math.percentChance(20)) {
-                    dropgoldheals("Heal", sprite, 1)
-                }
-                if (Math.percentChance(5)) {
-                    dropgoldheals("Heal", sprite, 2)
-                }
-            }
-        }
-    }
-})
 scene.onHitWall(SpriteKind.Projectile, function (sprite, location) {
     if (tiles.tileAtLocationEquals(location, assets.tile`myTile17`)) {
         tiles.setTileAt(location, assets.tile`myTile30`)
@@ -5216,7 +5182,7 @@ controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
                     if (inhubworld) {
                         inhubworld = false
                         sprites.setDataNumber(hitbox, "levelsdoing", 20)
-                        sprites.setDataNumber(hitbox, "levels-in", 18)
+                        sprites.setDataNumber(hitbox, "levels-in", 0)
                         sprites.destroyAllSpritesOfKind(SpriteKind.text)
                         sprites.destroy(textSprite)
                         levelsdisplay = textsprite.create("" + convertToText(sprites.readDataNumber(hitbox, "levelsdoing")) + "/" + convertToText(sprites.readDataNumber(hitbox, "levels-in")))
@@ -5310,8 +5276,8 @@ function BossStart () {
         .........b...cc.cc...b..........
         .............cc.cc..............
         `],
-    500,
-    characterAnimations.rule(Predicate.FacingRight)
+    100,
+    characterAnimations.rule(Predicate.FacingRight, Predicate.NotMoving)
     )
     characterAnimations.loopFrames(
     Boss,
@@ -5334,7 +5300,7 @@ function BossStart () {
         ..............cc.cc.............
         `],
     500,
-    characterAnimations.rule(Predicate.FacingLeft)
+    characterAnimations.rule(Predicate.FacingLeft, Predicate.NotMoving)
     )
     characterAnimations.loopFrames(
     Boss,
@@ -5408,7 +5374,7 @@ function BossStart () {
         ..............cc.cc.............
         `],
     100,
-    characterAnimations.rule(Predicate.MovingLeft)
+    characterAnimations.rule(Predicate.MovingLeft, Predicate.Moving)
     )
     characterAnimations.loopFrames(
     Boss,
@@ -5482,15 +5448,15 @@ function BossStart () {
         .............cc.cc..............
         `],
     100,
-    characterAnimations.rule(Predicate.MovingRight)
+    characterAnimations.rule(Predicate.MovingRight, Predicate.Moving)
     )
     Boss.ay = 200
     statusbar = statusbars.create(40, 4, StatusBarKind.EnemyHealth)
     statusbar.setColor(2, 12, 4)
     statusbar.setStatusBarFlag(StatusBarFlag.SmoothTransition, true)
     statusbar.attachToSprite(Boss, 3, 0)
-    statusbar.value = 50
-    statusbar.max = 50
+    statusbar.value = 100
+    statusbar.max = 100
     statusbar.setLabel("Bandit")
     sprites.setDataNumber(Boss, "Lootchance", 91)
     sprites.setDataNumber(Boss, "enemy", 101)
@@ -5502,16 +5468,99 @@ statusbars.onZero(StatusBarKind.EnemyHealth, function (status) {
 })
 sprites.onDestroyed(SpriteKind.Emprject, function (sprite) {
     music.play(music.createSoundEffect(WaveShape.Noise, 2254, 1, 163, 44, 190, SoundExpressionEffect.None, InterpolationCurve.Logarithmic), music.PlaybackMode.InBackground)
-    myEffect = extraEffects.createCustomSpreadEffectData(
-    extraEffects.createPresetColorTable(ExtraEffectPresetColor.Toxic),
-    true,
-    extraEffects.createPresetSizeTable(ExtraEffectPresetShape.Explosion),
-    extraEffects.createPercentageRange(50, 100),
-    extraEffects.createPercentageRange(50, 100),
-    extraEffects.createTimeRange(200, 400)
-    )
+    if (sprites.readDataNumber(sprite, "color") == 2) {
+        myEffect = extraEffects.createCustomSpreadEffectData(
+        extraEffects.createPresetColorTable(ExtraEffectPresetColor.Fire),
+        true,
+        extraEffects.createPresetSizeTable(ExtraEffectPresetShape.Explosion),
+        extraEffects.createPercentageRange(50, 100),
+        extraEffects.createPercentageRange(50, 100),
+        extraEffects.createTimeRange(200, 400)
+        )
+    } else {
+        myEffect = extraEffects.createCustomSpreadEffectData(
+        extraEffects.createPresetColorTable(ExtraEffectPresetColor.Toxic),
+        true,
+        extraEffects.createPresetSizeTable(ExtraEffectPresetShape.Explosion),
+        extraEffects.createPercentageRange(50, 100),
+        extraEffects.createPercentageRange(50, 100),
+        extraEffects.createTimeRange(200, 400)
+        )
+    }
     myEffect.z = 0
     extraEffects.createSpreadEffectAt(myEffect, sprite.x, sprite.y, 100, 19, 30)
+    if (sprites.readDataNumber(sprite, "Blast") == 2) {
+        for (let index = 0; index < randint(1, 5); index++) {
+            Eshoot(randint(-200, 200), randint(-200, 200), 2, sprite)
+        }
+    }
+})
+sprites.onDestroyed(SpriteKind.Enemy, function (sprite) {
+    if (sprites.readDataNumber(sprite, "enemy") == 101) {
+        timer.background(function () {
+            game.setGameOverEffect(true, effects.confetti)
+            game.setGameOverMessage(true, "Thanks for playing more coming soon!!")
+        })
+    } else {
+        if (sprites.readDataBoolean(hitbox, "Inlevel")) {
+            if (Math.percentChance(10)) {
+                dropgoldheals("Chest", sprite, 3)
+            }
+            for (let index = 0; index < 1 + sprites.readDataNumber(hitbox, "More-Gold-drops"); index++) {
+                if (sprites.readDataNumber(sprite, "Lootchance") == 1) {
+                    if (Math.percentChance(50)) {
+                        dropgoldheals("gold", sprite, 1)
+                    }
+                    if (Math.percentChance(30)) {
+                        dropgoldheals("gold", sprite, 2)
+                    }
+                } else if (sprites.readDataNumber(sprite, "Lootchance") == 2) {
+                    if (Math.percentChance(70)) {
+                        dropgoldheals("gold", sprite, 1)
+                    }
+                    if (Math.percentChance(50)) {
+                        dropgoldheals("gold", sprite, 2)
+                    }
+                } else if (sprites.readDataNumber(sprite, "Lootchance") == 5) {
+                    if (Math.percentChance(70)) {
+                        dropgoldheals("gold", sprite, 2)
+                    }
+                    if (Math.percentChance(50)) {
+                        dropgoldheals("gold", sprite, 3)
+                    }
+                } else if (sprites.readDataNumber(sprite, "Lootchance") == 10) {
+                    for (let index = 0; index < 2; index++) {
+                        if (Math.percentChance(70)) {
+                            dropgoldheals("gold", sprite, 2)
+                        }
+                        if (Math.percentChance(50)) {
+                            dropgoldheals("gold", sprite, 3)
+                        }
+                        if (Math.percentChance(20)) {
+                            dropgoldheals("Heal", sprite, 1)
+                        }
+                    }
+                }
+            }
+            for (let index = 0; index < sprites.readDataNumber(hitbox, "enemies-drop-more-HP"); index++) {
+                if (sprites.readDataNumber(sprite, "Lootchance") == 1) {
+                    if (Math.percentChance(20)) {
+                        dropgoldheals("Heal", sprite, 1)
+                    }
+                    if (Math.percentChance(5)) {
+                        dropgoldheals("Heal", sprite, 2)
+                    }
+                } else if (sprites.readDataNumber(sprite, "Lootchance") == 2) {
+                    if (Math.percentChance(20)) {
+                        dropgoldheals("Heal", sprite, 1)
+                    }
+                    if (Math.percentChance(5)) {
+                        dropgoldheals("Heal", sprite, 2)
+                    }
+                }
+            }
+        }
+    }
 })
 sprites.onOverlap(SpriteKind.sword, SpriteKind.Enemy, function (sprite, otherSprite) {
     music.play(music.createSoundEffect(WaveShape.Noise, 3181, 600, 123, 0, 100, SoundExpressionEffect.None, InterpolationCurve.Logarithmic), music.PlaybackMode.InBackground)
@@ -5533,15 +5582,7 @@ controller.down.onEvent(ControllerButtonEvent.Pressed, function () {
                     controller.moveSprite(hitbox, 0, 0)
                     dash = true
                     RL = false
-                    if (sprites.readDataNumber(hitbox, "More-slide-speed") <= 0) {
-                        hitbox.vx = 0 - 120
-                    } else if (sprites.readDataNumber(hitbox, "More-slide-speed") == 1) {
-                        hitbox.vx = 0 - 130
-                    } else if (sprites.readDataNumber(hitbox, "More-slide-speed") == 2) {
-                        hitbox.vx = 0 - 140
-                    } else {
-                        hitbox.vx = 0 - 150
-                    }
+                    hitbox.vx = 0 - (120 + 10 * sprites.readDataNumber(hitbox, "More-slide-speed"))
                     hitbox.setImage(img`
                         ................................
                         ................................
@@ -5623,15 +5664,7 @@ controller.down.onEvent(ControllerButtonEvent.Pressed, function () {
                     controller.moveSprite(hitbox, 0, 0)
                     dash = true
                     RL = true
-                    if (sprites.readDataNumber(hitbox, "More-slide-speed") <= 0) {
-                        hitbox.vx = 0 + 120
-                    } else if (sprites.readDataNumber(hitbox, "More-slide-speed") == 1) {
-                        hitbox.vx = 0 + 130
-                    } else if (sprites.readDataNumber(hitbox, "More-slide-speed") == 2) {
-                        hitbox.vx = 0 + 140
-                    } else {
-                        hitbox.vx = 0 + 150
-                    }
+                    hitbox.vx = 0 + (120 + 10 * sprites.readDataNumber(hitbox, "More-slide-speed"))
                     hitbox.setImage(img`
                         ................................
                         ................................
@@ -5788,7 +5821,8 @@ controller.down.onEvent(ControllerButtonEvent.Released, function () {
         }
     }
 })
-let projectile2: Sprite = null
+let numb_of_swords = 0
+let moveset = 0
 let Boss: Sprite = null
 let pickaupgrade = 0
 let cam: Sprite = null
@@ -5806,6 +5840,7 @@ let op3: Sprite = null
 let op2: Sprite = null
 let op1: Sprite = null
 let myEffect: SpreadEffectData = null
+let projectile2: Sprite = null
 let Goldcoin: Sprite = null
 let statusbar: StatusBarSprite = null
 let rat: Sprite = null
@@ -6115,6 +6150,11 @@ sprites.setDataBoolean(hitbox, "Inlevel", false)
 if (blockSettings.exists("main")) {
     main_lobby()
 }
+if (true) {
+    sprites.setDataNumber(hitbox, "More-slide-speed", 5)
+    sprites.setDataNumber(hitbox, "multishot", 5)
+    sprites.setDataNumber(hitbox, "homing-blasts", 5)
+}
 forever(function () {
     for (let value of sprites.allOfKind(SpriteKind.Enemy)) {
         if (sprites.readDataNumber(value, "enemy") == 1) {
@@ -6184,6 +6224,372 @@ forever(function () {
             })
         }
     }
+    for (let value of spriteutils.getSpritesWithin(SpriteKind.Enemy, 100, hitbox)) {
+        if (sprites.readDataNumber(value, "enemy") == 10) {
+            timer.throttle("Summon", 1000, function () {
+                for (let index = 0; index < randint(1, 5); index++) {
+                    rat = sprites.create(assets.tile`myTile61`, SpriteKind.Enemy)
+                    statusbar = statusbars.create(20, 4, StatusBarKind.EnemyHealth)
+                    statusbar.setColor(2, 12, 4)
+                    statusbar.setStatusBarFlag(StatusBarFlag.SmoothTransition, true)
+                    statusbar.attachToSprite(rat)
+                    statusbar.value = 3
+                    statusbar.max = 3
+                    rat.follow(hitbox, 50)
+                    sprites.setDataNumber(rat, "Lootchance", 2)
+                    sprites.setDataNumber(rat, "enemy", 2)
+                    rat.x = value.x
+                    rat.y = value.y
+                    rat.x += randint(-10, 10)
+                    rat.y += randint(-10, 10)
+                }
+            })
+        }
+    }
+})
+forever(function () {
+    for (let value of sprites.allOfKind(SpriteKind.Enemy)) {
+        if (sprites.readDataNumber(value, "enemy") == 101) {
+            moveset = randint(1, 4)
+            if (moveset == 1) {
+                sprites.setDataBoolean(value, "Stoprunning", true)
+                value.vx = 80
+                while (sprites.readDataBoolean(value, "Stoprunning")) {
+                    if (tiles.tileAtLocationIsWall(value.tilemapLocation().getNeighboringLocation(CollisionDirection.Left)) || !(tiles.tileAtLocationIsWall(value.tilemapLocation().getNeighboringLocation(CollisionDirection.Bottom).getNeighboringLocation(CollisionDirection.Left)))) {
+                        value.vx = 80
+                    } else if (tiles.tileAtLocationIsWall(value.tilemapLocation().getNeighboringLocation(CollisionDirection.Right)) || !(tiles.tileAtLocationIsWall(value.tilemapLocation().getNeighboringLocation(CollisionDirection.Bottom).getNeighboringLocation(CollisionDirection.Right)))) {
+                        value.vx = -80
+                    }
+                    pause(10)
+                    timer.throttle("Bshoot", 500, function () {
+                        Eshoot(200, 0, 2, value)
+                        Eshoot(-200, 0, 2, value)
+                        if (Math.percentChance(50)) {
+                            sprites.setDataBoolean(value, "Stoprunning", false)
+                        }
+                    })
+                }
+            } else if (moveset == 2) {
+                for (let index = 0; index < 2; index++) {
+                    value.vx = 0
+                    characterAnimations.setCharacterAnimationsEnabled(value, false)
+                    if (value.x < hitbox.x) {
+                        animation.runImageAnimation(
+                        value,
+                        [img`
+                            .............eeeeee.............
+                            ............e444444e............
+                            ..........e.e444444e.e..........
+                            ..........eeeeeeeeeeee..........
+                            ............cccfcfc.............
+                            .............bccccc.............
+                            .............bbbfbb.............
+                            .............bbbbb....b.........
+                            ...........cce444ecccccbbbb.....
+                            .........cccee444eecccccc.......
+                            ........bccceee4eeec............
+                            .........bc.eeeeeee.............
+                            .........bc.eeeeeee.............
+                            .........b...ecece..............
+                            .........b...cc.cc..............
+                            .............cc.cc..............
+                            `,img`
+                            .............eeeeee.............
+                            ............e444444e............
+                            ..........e.e444444e.e..........
+                            ..........eeeeeeeeeeee..........
+                            ............cccfcfc.............
+                            .............bccccc.............
+                            .............bbbfbb.............
+                            .............bbbbb....b.........
+                            ...........cce444eccccbbbb......
+                            .........cccee444eecccccc.......
+                            ........bccceee4eeec............
+                            .........bc.eeeeeee.............
+                            .........bc.eeeeeee.............
+                            .........b...ecece..............
+                            .........b...cc.cc..............
+                            .............cc.cc..............
+                            `,img`
+                            .............eeeeee.............
+                            ............e444444e............
+                            ..........e.e444444e.e..........
+                            ..........eeeeeeeeeeee..........
+                            ............cccfcfc.............
+                            .............bccccc.............
+                            .............bbbfbb.............
+                            .............bbbbb...b..........
+                            ...........cce444eccccbbbb......
+                            .........cccee444eeccccc........
+                            ........bccceee4eeec............
+                            .........bc.eeeeeee.............
+                            .........bc.eeeeeee.............
+                            .........b...ecece..............
+                            .........b...cc.cc..............
+                            .............cc.cc..............
+                            `],
+                        100,
+                        true
+                        )
+                    } else {
+                        animation.runImageAnimation(
+                        value,
+                        [img`
+                            .............eeeeee.............
+                            ............e444444e............
+                            ..........e.e444444e.e..........
+                            ..........eeeeeeeeeeee..........
+                            .............cfcfccc............
+                            .............cccccb.............
+                            .............bbfbbb.............
+                            .........b....bbbbb.............
+                            .....bbbbccccce444ecc...........
+                            .......ccccccee444eeccc.........
+                            ............ceee4eeecccb........
+                            .............eeeeeee.cb.........
+                            .............eeeeeee.cb.........
+                            ..............ecece...b.........
+                            ..............cc.cc...b.........
+                            ..............cc.cc.............
+                            `,img`
+                            .............eeeeee.............
+                            ............e444444e............
+                            ..........e.e444444e.e..........
+                            ..........eeeeeeeeeeee..........
+                            .............cfcfccc............
+                            .............cccccb.............
+                            .............bbfbbb.............
+                            .........b....bbbbb.............
+                            ......bbbbcccce444ecc...........
+                            .......ccccccee444eeccc.........
+                            ............ceee4eeecccb........
+                            .............eeeeeee.cb.........
+                            .............eeeeeee.cb.........
+                            ..............ecece...b.........
+                            ..............cc.cc...b.........
+                            ..............cc.cc.............
+                            `,img`
+                            .............eeeeee.............
+                            ............e444444e............
+                            ..........e.e444444e.e..........
+                            ..........eeeeeeeeeeee..........
+                            .............cfcfccc............
+                            .............cccccb.............
+                            .............bbfbbb.............
+                            ..........b...bbbbb.............
+                            ......bbbbcccce444ecc...........
+                            ........cccccee444eeccc.........
+                            ............ceee4eeecccb........
+                            .............eeeeeee.cb.........
+                            .............eeeeeee.cb.........
+                            ..............ecece...b.........
+                            ..............cc.cc...b.........
+                            ..............cc.cc.............
+                            `],
+                        100,
+                        true
+                        )
+                    }
+                    for (let index = 0; index < 4; index++) {
+                        if (value.x < hitbox.x) {
+                            Eshoot(200, 0, 2, value)
+                        } else {
+                            Eshoot(-200, 0, 2, value)
+                        }
+                        pause(200)
+                    }
+                    animation.stopAnimation(animation.AnimationTypes.All, value)
+                    characterAnimations.setCharacterAnimationsEnabled(value, true)
+                    pause(1000)
+                }
+            } else if (moveset == 3) {
+                for (let index = 0; index < 2; index++) {
+                    value.vx = 0
+                    characterAnimations.setCharacterAnimationsEnabled(value, false)
+                    if (value.x < hitbox.x) {
+                        animation.runImageAnimation(
+                        value,
+                        [img`
+                            .............eeeeee.............
+                            ............e444444e............
+                            ..........e.e444444e.e..........
+                            ..........eeeeeeeeeeee..........
+                            ............cccfcfc.............
+                            .............bccccc.............
+                            .............bbbfbb.............
+                            .............bbbbb....b.........
+                            ...........cce444ecccccbbbb.....
+                            .........cccee444eecccccc.......
+                            ........bccceee4eeec............
+                            .........bc.eeeeeee.............
+                            .........bc.eeeeeee.............
+                            .........b...ecece..............
+                            .........b...cc.cc..............
+                            .............cc.cc..............
+                            `,img`
+                            .............eeeeee.............
+                            ............e444444e............
+                            ..........e.e444444e.e..........
+                            ..........eeeeeeeeeeee..........
+                            ............cccfcfc.............
+                            .............bccccc.............
+                            .............bbbfbb.............
+                            .............bbbbb....b.........
+                            ...........cce444eccccbbbb......
+                            .........cccee444eecccccc.......
+                            ........bccceee4eeec............
+                            .........bc.eeeeeee.............
+                            .........bc.eeeeeee.............
+                            .........b...ecece..............
+                            .........b...cc.cc..............
+                            .............cc.cc..............
+                            `,img`
+                            .............eeeeee.............
+                            ............e444444e............
+                            ..........e.e444444e.e..........
+                            ..........eeeeeeeeeeee..........
+                            ............cccfcfc.............
+                            .............bccccc.............
+                            .............bbbfbb.............
+                            .............bbbbb...b..........
+                            ...........cce444eccccbbbb......
+                            .........cccee444eeccccc........
+                            ........bccceee4eeec............
+                            .........bc.eeeeeee.............
+                            .........bc.eeeeeee.............
+                            .........b...ecece..............
+                            .........b...cc.cc..............
+                            .............cc.cc..............
+                            `],
+                        100,
+                        true
+                        )
+                    } else {
+                        animation.runImageAnimation(
+                        value,
+                        [img`
+                            .............eeeeee.............
+                            ............e444444e............
+                            ..........e.e444444e.e..........
+                            ..........eeeeeeeeeeee..........
+                            .............cfcfccc............
+                            .............cccccb.............
+                            .............bbfbbb.............
+                            .........b....bbbbb.............
+                            .....bbbbccccce444ecc...........
+                            .......ccccccee444eeccc.........
+                            ............ceee4eeecccb........
+                            .............eeeeeee.cb.........
+                            .............eeeeeee.cb.........
+                            ..............ecece...b.........
+                            ..............cc.cc...b.........
+                            ..............cc.cc.............
+                            `,img`
+                            .............eeeeee.............
+                            ............e444444e............
+                            ..........e.e444444e.e..........
+                            ..........eeeeeeeeeeee..........
+                            .............cfcfccc............
+                            .............cccccb.............
+                            .............bbfbbb.............
+                            .........b....bbbbb.............
+                            ......bbbbcccce444ecc...........
+                            .......ccccccee444eeccc.........
+                            ............ceee4eeecccb........
+                            .............eeeeeee.cb.........
+                            .............eeeeeee.cb.........
+                            ..............ecece...b.........
+                            ..............cc.cc...b.........
+                            ..............cc.cc.............
+                            `,img`
+                            .............eeeeee.............
+                            ............e444444e............
+                            ..........e.e444444e.e..........
+                            ..........eeeeeeeeeeee..........
+                            .............cfcfccc............
+                            .............cccccb.............
+                            .............bbfbbb.............
+                            ..........b...bbbbb.............
+                            ......bbbbcccce444ecc...........
+                            ........cccccee444eeccc.........
+                            ............ceee4eeecccb........
+                            .............eeeeeee.cb.........
+                            .............eeeeeee.cb.........
+                            ..............ecece...b.........
+                            ..............cc.cc...b.........
+                            ..............cc.cc.............
+                            `],
+                        100,
+                        true
+                        )
+                    }
+                    for (let index = 0; index < 4; index++) {
+                        if (value.x < hitbox.x) {
+                            Eshoot(200, 0, 2, value)
+                            for (let index = 0; index < 2; index++) {
+                                Eshoot(200, randint(-100, 100), 2, value)
+                            }
+                        } else {
+                            Eshoot(-200, 0, 2, value)
+                            for (let index = 0; index < 2; index++) {
+                                Eshoot(-200, randint(-100, 100), 2, value)
+                            }
+                        }
+                        pause(500)
+                    }
+                    animation.stopAnimation(animation.AnimationTypes.All, value)
+                    characterAnimations.setCharacterAnimationsEnabled(value, true)
+                    pause(1000)
+                }
+            } else if (moveset == 4) {
+                sprites.setDataBoolean(value, "Stoprunning", true)
+                value.vx = 80
+                while (sprites.readDataBoolean(value, "Stoprunning")) {
+                    if (tiles.tileAtLocationIsWall(value.tilemapLocation().getNeighboringLocation(CollisionDirection.Left)) || !(tiles.tileAtLocationIsWall(value.tilemapLocation().getNeighboringLocation(CollisionDirection.Bottom).getNeighboringLocation(CollisionDirection.Left)))) {
+                        value.vx = 80
+                    } else if (tiles.tileAtLocationIsWall(value.tilemapLocation().getNeighboringLocation(CollisionDirection.Right)) || !(tiles.tileAtLocationIsWall(value.tilemapLocation().getNeighboringLocation(CollisionDirection.Bottom).getNeighboringLocation(CollisionDirection.Right)))) {
+                        value.vx = -80
+                    }
+                    pause(10)
+                    timer.throttle("Bshoot", 500, function () {
+                        for (let index = 0; index < 1; index++) {
+                            projectile2 = sprites.createProjectileFromSprite(img`
+                                2 2 
+                                2 2 
+                                `, value, -200, 0)
+                            projectile2.z = 0
+                            sprites.setDataNumber(projectile2, "color", 2)
+                            sprites.setDataNumber(projectile2, "Blast", 2)
+                            projectile2.setKind(SpriteKind.Emprject)
+                            projectile2.ay = 200
+                            projectile2.setFlag(SpriteFlag.DestroyOnWall, false)
+                            projectile2.setFlag(SpriteFlag.BounceOnWall, true)
+                            projectile2.lifespan = 500
+                            music.play(music.createSoundEffect(WaveShape.Square, 2040, 1, 130, 0, 200, SoundExpressionEffect.None, InterpolationCurve.Curve), music.PlaybackMode.InBackground)
+                        }
+                        for (let index = 0; index < 1; index++) {
+                            projectile2 = sprites.createProjectileFromSprite(img`
+                                2 2 
+                                2 2 
+                                `, value, 200, 0)
+                            projectile2.z = 0
+                            sprites.setDataNumber(projectile2, "color", 2)
+                            sprites.setDataNumber(projectile2, "Blast", 2)
+                            projectile2.setKind(SpriteKind.Emprject)
+                            projectile2.ay = 200
+                            projectile2.setFlag(SpriteFlag.DestroyOnWall, false)
+                            projectile2.setFlag(SpriteFlag.BounceOnWall, true)
+                            projectile2.lifespan = 500
+                            music.play(music.createSoundEffect(WaveShape.Square, 2040, 1, 130, 0, 200, SoundExpressionEffect.None, InterpolationCurve.Curve), music.PlaybackMode.InBackground)
+                        }
+                        if (Math.percentChance(50)) {
+                            sprites.setDataBoolean(value, "Stoprunning", false)
+                        }
+                    })
+                }
+            }
+        }
+    }
 })
 forever(function () {
     if (sprites.readDataNumber(hitbox, "Rapid-fire") >= 1) {
@@ -6227,15 +6633,34 @@ forever(function () {
             textSprite.setText("")
         }
     }
+    numb_of_swords = 0
+    for (let value of sprites.allOfKind(SpriteKind.sword)) {
+        numb_of_swords += 1
+        if (numb_of_swords >= 30) {
+            sprites.destroyAllSpritesOfKind(SpriteKind.sword)
+        }
+    }
+    console.logValue("sword", numb_of_swords)
     for (let value of sprites.allOfKind(SpriteKind.Emprject)) {
-        myEffect = extraEffects.createCustomSpreadEffectData(
-        extraEffects.createPresetColorTable(ExtraEffectPresetColor.Toxic),
-        true,
-        extraEffects.createPresetSizeTable(ExtraEffectPresetShape.Spark),
-        extraEffects.createPercentageRange(50, 100),
-        extraEffects.createPercentageRange(50, 100),
-        extraEffects.createTimeRange(200, 400)
-        )
+        if (sprites.readDataNumber(value, "color") == 2) {
+            myEffect = extraEffects.createCustomSpreadEffectData(
+            extraEffects.createPresetColorTable(ExtraEffectPresetColor.Fire),
+            true,
+            extraEffects.createPresetSizeTable(ExtraEffectPresetShape.Spark),
+            extraEffects.createPercentageRange(50, 100),
+            extraEffects.createPercentageRange(50, 100),
+            extraEffects.createTimeRange(200, 400)
+            )
+        } else {
+            myEffect = extraEffects.createCustomSpreadEffectData(
+            extraEffects.createPresetColorTable(ExtraEffectPresetColor.Toxic),
+            true,
+            extraEffects.createPresetSizeTable(ExtraEffectPresetShape.Spark),
+            extraEffects.createPercentageRange(50, 100),
+            extraEffects.createPercentageRange(50, 100),
+            extraEffects.createTimeRange(200, 400)
+            )
+        }
         myEffect.z = 0
         extraEffects.createSpreadEffectOnAnchor(value, myEffect, 1, 2, 3)
     }
