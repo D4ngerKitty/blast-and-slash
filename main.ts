@@ -4548,36 +4548,38 @@ function Eshoot (num: number, num2: number, num3: number, mySprite: Sprite) {
     }
 }
 function changelog () {
-    story.showPlayerChoices("v.1.0", "back")
+    story.showPlayerChoices("v.1.0", "v1.1", "back")
+    game.setDialogFrame(img`
+        .cccccccccccccccccccccc.
+        cccccccccccccccccccccccc
+        cccffffffffffffffffffccc
+        ccffffffffffffffffffffcc
+        ccffffffffffffffffffffcc
+        ccffffffffffffffffffffcc
+        ccffffffffffffffffffffcc
+        ccffffffffffffffffffffcc
+        ccffffffffffffffffffffcc
+        ccffffffffffffffffffffcc
+        ccffffffffffffffffffffcc
+        ccffffffffffffffffffffcc
+        ccffffffffffffffffffffcc
+        ccffffffffffffffffffffcc
+        ccffffffffffffffffffffcc
+        ccffffffffffffffffffffcc
+        ccffffffffffffffffffffcc
+        ccffffffffffffffffffffcc
+        ccffffffffffffffffffffcc
+        ccffffffffffffffffffffcc
+        ccffffffffffffffffffffcc
+        cccffffffffffffffffffccc
+        cccccccccccccccccccccccc
+        .cccccccccccccccccccccc.
+        `)
+    game.setDialogTextColor(9)
     if (story.getLastAnswer() == "v.1.0") {
-        game.setDialogFrame(img`
-            .cccccccccccccccccccccc.
-            cccccccccccccccccccccccc
-            cccffffffffffffffffffccc
-            ccffffffffffffffffffffcc
-            ccffffffffffffffffffffcc
-            ccffffffffffffffffffffcc
-            ccffffffffffffffffffffcc
-            ccffffffffffffffffffffcc
-            ccffffffffffffffffffffcc
-            ccffffffffffffffffffffcc
-            ccffffffffffffffffffffcc
-            ccffffffffffffffffffffcc
-            ccffffffffffffffffffffcc
-            ccffffffffffffffffffffcc
-            ccffffffffffffffffffffcc
-            ccffffffffffffffffffffcc
-            ccffffffffffffffffffffcc
-            ccffffffffffffffffffffcc
-            ccffffffffffffffffffffcc
-            ccffffffffffffffffffffcc
-            ccffffffffffffffffffffcc
-            cccffffffffffffffffffccc
-            cccccccccccccccccccccccc
-            .cccccccccccccccccccccc.
-            `)
-        game.setDialogTextColor(9)
         game.showLongText("This is the first reless of blast and slash of the female game jam. you can find one boss and up to 8 different upgrades. with 7 different enemies.    If you want to play to non gamejam verson its up on gethub at d4ngerkitty/blast-and-slash", DialogLayout.Center)
+    } else if (story.getLastAnswer() == "v1.1") {
+        game.showLongText("This update adds one new level, a new Wepen that drops form the first boss, and some blancing", DialogLayout.Center)
     }
 }
 sprites.onDestroyed(SpriteKind.Projectile, function (sprite) {
@@ -7315,11 +7317,6 @@ forever(function () {
         }
     }
 })
-game.onUpdate(function () {
-    if (in_menus) {
-        Zoom.SetZoomFilter(2, Mode.Right)
-    }
-})
 forever(function () {
     if (sprites.readDataNumber(hitbox, "Rapid-fire") >= 1) {
         if (controller.A.isPressed()) {
@@ -9769,6 +9766,11 @@ forever(function () {
             }
             sprites.setDataBoolean(value, "amation", false)
         }
+    }
+})
+game.onUpdate(function () {
+    if (in_menus) {
+        Zoom.SetZoomFilter(2, Mode.Right)
     }
 })
 forever(function () {
