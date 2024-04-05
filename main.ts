@@ -44,7 +44,11 @@ controller.B.onEvent(ControllerButtonEvent.Pressed, function () {
                     showrdnub = 7
                     for (let index = 0; index < 3; index++) {
                         for (let index = 0; index < 10; index++) {
-                            extraEffects.createSpreadEffectAt(extraEffects.createSingleColorSpreadEffectData(11, ExtraEffectPresetShape.Spark), hitbox.x, hitbox.y + showrdnub, 100, 1, 1)
+                            timer.background(function () {
+                                if (particalson) {
+                                    extraEffects.createSpreadEffectAt(extraEffects.createSingleColorSpreadEffectData(11, ExtraEffectPresetShape.Spark), hitbox.x, hitbox.y + showrdnub, 100, 1, 1)
+                                }
+                            })
                             pause(1)
                         }
                         showrdnub += -2
@@ -52,7 +56,11 @@ controller.B.onEvent(ControllerButtonEvent.Pressed, function () {
                     for (let index = 0; index < 3; index++) {
                         showrdnub += 2
                         for (let index = 0; index < 10; index++) {
-                            extraEffects.createSpreadEffectAt(extraEffects.createSingleColorSpreadEffectData(11, ExtraEffectPresetShape.Spark), hitbox.x, hitbox.y + showrdnub, 100, 2, 1)
+                            timer.background(function () {
+                                if (particalson) {
+                                    extraEffects.createSpreadEffectAt(extraEffects.createSingleColorSpreadEffectData(11, ExtraEffectPresetShape.Spark), hitbox.x, hitbox.y + showrdnub, 100, 2, 1)
+                                }
+                            })
                             pause(1)
                         }
                     }
@@ -2708,13 +2716,177 @@ controller.B.onEvent(ControllerButtonEvent.Pressed, function () {
         }
     }
 })
+controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
+    if (spriteutils.isDestroyed(reloading)) {
+        if (inshop) {
+            if (sprites.readDataNumber(hitbox, "picked") == 2) {
+                if (sprites.readDataNumber(op2, "The cost") <= info.score()) {
+                    info.changeScoreBy(0 - sprites.readDataNumber(op2, "The cost"))
+                    sprites.changeDataNumberBy(hitbox, sprites.readDataString(op2, "Name2"), 1)
+                    sprites.changeDataNumberBy(hitbox, "price", randint(0, 8))
+                    leaveshop()
+                } else {
+                    scene.cameraShake(4, 500)
+                }
+            } else if (sprites.readDataNumber(hitbox, "picked") == 3) {
+                if (sprites.readDataNumber(op3, "The cost") <= info.score()) {
+                    info.changeScoreBy(0 - sprites.readDataNumber(op3, "The cost"))
+                    sprites.changeDataNumberBy(hitbox, sprites.readDataString(op3, "Name2"), 1)
+                    sprites.changeDataNumberBy(hitbox, "price", randint(0, 8))
+                    leaveshop()
+                } else {
+                    scene.cameraShake(4, 500)
+                }
+            } else if (sprites.readDataNumber(hitbox, "picked") == 1) {
+                if (sprites.readDataNumber(op1, "The cost") <= info.score()) {
+                    info.changeScoreBy(0 - sprites.readDataNumber(op1, "The cost"))
+                    sprites.changeDataNumberBy(hitbox, sprites.readDataString(op1, "Name2"), 1)
+                    sprites.changeDataNumberBy(hitbox, "price", randint(0, 8))
+                    leaveshop()
+                } else {
+                    scene.cameraShake(4, 500)
+                }
+            }
+        } else {
+            if (!(in_menus)) {
+                for (let value of spriteutils.getSpritesWithin(SpriteKind.shop, 40, mySprite)) {
+                    inshop = true
+                    mySprite.setFlag(SpriteFlag.Invisible, true)
+                    layer_one.setFlag(SpriteFlag.Invisible, true)
+                    layer_2.setFlag(SpriteFlag.Invisible, true)
+                    controller.moveSprite(hitbox, 0, 0)
+                    sprites.setDataNumber(hitbox, "picked", 2)
+                    scene.cameraFollowSprite(value)
+                    Zoom.SetZoomFilter(2, Mode.Center)
+                    for (let value of tiles.getTilesByType(assets.tile`myTile64`)) {
+                        pickaupgrade = randint(0, numbofupgrades)
+                        op2 = sprites.create(list_of_upgreads[pickaupgrade].clone(), SpriteKind.background)
+                        tiles.placeOnTile(op2, value)
+                        tiles.setTileAt(value, assets.tile`myTile`)
+                        sprites.setDataSprite(op2, "name", textsprite.create("" + listofupgrades[pickaupgrade] + "-" + (sprites.readDataNumber(hitbox, listofupgrades[pickaupgrade]) + 1), 0, 5))
+                        tiles.placeOnTile(sprites.readDataSprite(op2, "name"), value.getNeighboringLocation(CollisionDirection.Bottom))
+                        sprites.setDataString(op2, "Name2", listofupgrades[pickaupgrade])
+                        op2.image.replace(12, 5)
+                        sprites.setDataSprite(op2, "CostS", textsprite.create("Cost:" + convertToText(sprites.readDataNumber(hitbox, "price") + list_of_pirces[pickaupgrade]), 0, 4))
+                        tiles.placeOnTile(sprites.readDataSprite(op2, "CostS"), value.getNeighboringLocation(CollisionDirection.Top))
+                        sprites.setDataNumber(op2, "The cost", sprites.readDataNumber(hitbox, "price") + list_of_pirces[pickaupgrade])
+                    }
+                    for (let value of tiles.getTilesByType(assets.tile`myTile65`)) {
+                        pickaupgrade = randint(0, numbofupgrades)
+                        op1 = sprites.create(list_of_upgreads[pickaupgrade].clone(), SpriteKind.background)
+                        tiles.placeOnTile(op1, value)
+                        tiles.setTileAt(value, assets.tile`myTile`)
+                        sprites.setDataSprite(op1, "name", textsprite.create("" + listofupgrades[pickaupgrade] + "-" + (sprites.readDataNumber(hitbox, listofupgrades[pickaupgrade]) + 1), 0, 5))
+                        sprites.readDataSprite(op1, "name").setFlag(SpriteFlag.Invisible, true)
+                        sprites.setDataString(op1, "Name2", listofupgrades[pickaupgrade])
+                        tiles.placeOnTile(sprites.readDataSprite(op1, "name"), op2.tilemapLocation().getNeighboringLocation(CollisionDirection.Bottom))
+                        sprites.setDataSprite(op1, "CostS", textsprite.create("Cost:" + convertToText(sprites.readDataNumber(hitbox, "price") + list_of_pirces[pickaupgrade]), 0, 4))
+                        tiles.placeOnTile(sprites.readDataSprite(op1, "CostS"), op2.tilemapLocation().getNeighboringLocation(CollisionDirection.Top))
+                        sprites.setDataNumber(op1, "The cost", sprites.readDataNumber(hitbox, "price") + list_of_pirces[pickaupgrade])
+                        sprites.readDataSprite(op1, "CostS").setFlag(SpriteFlag.Invisible, true)
+                    }
+                    for (let value of tiles.getTilesByType(assets.tile`myTile69`)) {
+                        pickaupgrade = randint(0, numbofupgrades)
+                        op3 = sprites.create(list_of_upgreads[pickaupgrade].clone(), SpriteKind.background)
+                        tiles.placeOnTile(op3, value)
+                        tiles.setTileAt(value, assets.tile`myTile`)
+                        sprites.setDataSprite(op3, "name", textsprite.create("" + listofupgrades[pickaupgrade] + "-" + (sprites.readDataNumber(hitbox, listofupgrades[pickaupgrade]) + 1), 0, 5))
+                        sprites.readDataSprite(op3, "name").setFlag(SpriteFlag.Invisible, true)
+                        sprites.setDataString(op3, "Name2", listofupgrades[pickaupgrade])
+                        tiles.placeOnTile(sprites.readDataSprite(op3, "name"), op2.tilemapLocation().getNeighboringLocation(CollisionDirection.Bottom))
+                        sprites.setDataSprite(op3, "CostS", textsprite.create("Cost:" + convertToText(sprites.readDataNumber(hitbox, "price") + list_of_pirces[pickaupgrade]), 0, 4))
+                        tiles.placeOnTile(sprites.readDataSprite(op3, "CostS"), op2.tilemapLocation().getNeighboringLocation(CollisionDirection.Top))
+                        sprites.setDataNumber(op3, "The cost", sprites.readDataNumber(hitbox, "price") + list_of_pirces[pickaupgrade])
+                        sprites.readDataSprite(op3, "CostS").setFlag(SpriteFlag.Invisible, true)
+                    }
+                }
+                if (!(inshop)) {
+                    if (hitbox.tileKindAt(TileDirection.Center, assets.tile`myTile43`)) {
+                        if (inhubworld) {
+                            story.showPlayerChoices("Level 1", "")
+                            inhubworld = false
+                            sprites.setDataNumber(hitbox, "levelsdoing", 20)
+                            sprites.setDataNumber(hitbox, "levels-in", 0)
+                            sprites.destroyAllSpritesOfKind(SpriteKind.text)
+                            sprites.destroy(textSprite)
+                            if (story.checkLastAnswer("Level 1")) {
+                                sprites.setDataNumber(hitbox, "World", 1)
+                            } else {
+                                sprites.setDataNumber(hitbox, "World", 2)
+                            }
+                            levelsdisplay = textsprite.create("" + convertToText(sprites.readDataNumber(hitbox, "levelsdoing")) + "/" + convertToText(sprites.readDataNumber(hitbox, "levels-in")))
+                            levelsdisplay.setScale(2, ScaleAnchor.Middle)
+                            levelsdisplay.setFlag(SpriteFlag.RelativeToCamera, true)
+                            levelsdisplay.setPosition(30, 230)
+                            levelsdisplay.setKind(SpriteKind.allevels)
+                            playtrack = 0
+                            music.stopAllSounds()
+                            playtrack = 2
+                            loadlevels()
+                        }
+                    } else if (can_be_in_menu && hitbox.tileKindAt(TileDirection.Center, assets.tile`myTile46`)) {
+                        if (inhubworld) {
+                            can_be_in_menu = false
+                            in_menus = true
+                            controller.moveSprite(hitbox, 0, 0)
+                            timer.background(function () {
+                                changelog()
+                                in_menus = false
+                                controller.moveSprite(hitbox, 100, 0)
+                                Zoom.SetZoomFilter(1, Mode.Center)
+                                timer.after(500, function () {
+                                    can_be_in_menu = true
+                                })
+                            })
+                        }
+                    } else if (can_be_in_menu && hitbox.tileKindAt(TileDirection.Center, assets.tile`myTile32`)) {
+                        if (inhubworld) {
+                            can_be_in_menu = false
+                            in_menus = true
+                            controller.moveSprite(hitbox, 0, 0)
+                            timer.background(function () {
+                                openingchest()
+                                in_menus = false
+                                controller.moveSprite(hitbox, 100, 0)
+                                Zoom.SetZoomFilter(1, Mode.Center)
+                                timer.after(500, function () {
+                                    can_be_in_menu = true
+                                })
+                            })
+                        }
+                    } else {
+                        if (sprites.readDataNumber(layer_one, "gun der") == 1) {
+                            shoot(0, -200)
+                        } else if (sprites.readDataNumber(layer_one, "gun der") == 2) {
+                            shoot(-200, 0)
+                        } else if (sprites.readDataNumber(layer_one, "gun der") == 3) {
+                            shoot(200, 0)
+                        } else if (sprites.readDataNumber(layer_one, "gun der") == 4) {
+                            shoot(0, 200)
+                        } else if (sprites.readDataNumber(layer_one, "gun der") == 5) {
+                            shoot(-200, -200)
+                        } else if (sprites.readDataNumber(layer_one, "gun der") == 6) {
+                            shoot(200, -200)
+                        } else if (sprites.readDataNumber(layer_one, "gun der") == 7) {
+                            shoot(-200, 200)
+                        } else if (sprites.readDataNumber(layer_one, "gun der") == 8) {
+                            shoot(200, 200)
+                        }
+                    }
+                }
+            }
+        }
+    }
+})
 sprites.onOverlap(SpriteKind.Player, SpriteKind.Enemy, function (sprite, otherSprite) {
     if (airdash) {
         info.changeLifeBy(-1)
         music.play(music.melodyPlayable(music.powerDown), music.PlaybackMode.UntilDone)
         pause(200)
     } else {
-        extraEffects.createSpreadEffectOnAnchor(otherSprite, extraEffects.createSingleColorSpreadEffectData(12, ExtraEffectPresetShape.Spark), 100)
+        if (particalson) {
+            extraEffects.createSpreadEffectOnAnchor(otherSprite, extraEffects.createSingleColorSpreadEffectData(12, ExtraEffectPresetShape.Spark), 100)
+        }
         statusbars.getStatusBarAttachedTo(StatusBarKind.EnemyHealth, otherSprite).value += -1 - sprites.readDataNumber(hitbox, "More-dash-damge")
         music.play(music.createSoundEffect(WaveShape.Noise, 3181, 600, 123, 0, 100, SoundExpressionEffect.None, InterpolationCurve.Logarithmic), music.PlaybackMode.InBackground)
         pause(1000)
@@ -3196,7 +3368,7 @@ function load_demo () {
         textSprite = textsprite.create("")
         textSprite.setMaxFontHeight(32)
         textSprite.setOutline(3, 6)
-        tiles.setTileAt(value, assets.tile`myTile33`)
+        tiles.setTileAt(value, assets.tile`myTile3`)
         tiles.placeOnTile(textSprite, value)
         sprites.setDataNumber(textSprite, "backgroundam", 99)
         textSprite.z = -1
@@ -3837,16 +4009,18 @@ scene.onOverlapTile(SpriteKind.Player, assets.tile`myTile27`, function (sprite, 
     if (!(airdash)) {
         timer.throttle("attacksound2", 100, function () {
             music.play(music.createSoundEffect(WaveShape.Noise, 1782, 357, 255, 115, 190, SoundExpressionEffect.None, InterpolationCurve.Logarithmic), music.PlaybackMode.InBackground)
-            myEffect2 = extraEffects.createCustomSpreadEffectData(
-            [12],
-            true,
-            extraEffects.createPresetSizeTable(ExtraEffectPresetShape.Spark),
-            extraEffects.createPercentageRange(50, 100),
-            extraEffects.createPercentageRange(50, 100),
-            extraEffects.createTimeRange(200, 400)
-            )
-            myEffect2.z = -3
-            extraEffects.createSpreadEffectAt(myEffect2, location.x, location.y, 500, 20)
+            if (particalson) {
+                myEffect2 = extraEffects.createCustomSpreadEffectData(
+                [12],
+                true,
+                extraEffects.createPresetSizeTable(ExtraEffectPresetShape.Spark),
+                extraEffects.createPercentageRange(50, 100),
+                extraEffects.createPercentageRange(50, 100),
+                extraEffects.createTimeRange(200, 400)
+                )
+                myEffect2.z = -3
+                extraEffects.createSpreadEffectAt(myEffect2, location.x, location.y, 500, 20)
+            }
         })
     }
 })
@@ -4407,17 +4581,42 @@ function changelog () {
     }
 }
 sprites.onDestroyed(SpriteKind.Projectile, function (sprite) {
-    music.play(music.createSoundEffect(WaveShape.Noise, 2254, 1, 163, 44, 190, SoundExpressionEffect.None, InterpolationCurve.Logarithmic), music.PlaybackMode.InBackground)
-    myEffect = extraEffects.createCustomSpreadEffectData(
-    extraEffects.createPresetColorTable(ExtraEffectPresetColor.Electric),
-    true,
-    extraEffects.createPresetSizeTable(ExtraEffectPresetShape.Explosion),
-    extraEffects.createPercentageRange(50, 100),
-    extraEffects.createPercentageRange(50, 100),
-    extraEffects.createTimeRange(200, 400)
-    )
-    myEffect.z = -1
-    extraEffects.createSpreadEffectAt(myEffect, sprite.x, sprite.y, 100, 19, 30)
+    if (sprites.readDataNumber(sprite, "Look") == 1) {
+        music.play(music.createSoundEffect(WaveShape.Noise, 2254, 1, 163, 44, 190, SoundExpressionEffect.None, InterpolationCurve.Logarithmic), music.PlaybackMode.InBackground)
+        if (particalson) {
+            myEffect = extraEffects.createCustomSpreadEffectData(
+            extraEffects.createPresetColorTable(ExtraEffectPresetColor.Electric),
+            true,
+            extraEffects.createPresetSizeTable(ExtraEffectPresetShape.Explosion),
+            extraEffects.createPercentageRange(50, 100),
+            extraEffects.createPercentageRange(50, 100),
+            extraEffects.createTimeRange(200, 400)
+            )
+            myEffect.z = -1
+            extraEffects.createSpreadEffectAt(myEffect, sprite.x, sprite.y, 100, 19, 30)
+        }
+    } else if (sprites.readDataNumber(sprite, "Look") == 2) {
+        music.play(music.createSoundEffect(WaveShape.Noise, 2254, 1, 163, 44, 190, SoundExpressionEffect.None, InterpolationCurve.Logarithmic), music.PlaybackMode.InBackground)
+        if (particalson) {
+            myEffect = extraEffects.createCustomSpreadEffectData(
+            extraEffects.createPresetColorTable(ExtraEffectPresetColor.Fire),
+            true,
+            extraEffects.createPresetSizeTable(ExtraEffectPresetShape.Cloud),
+            extraEffects.createPercentageRange(50, 100),
+            extraEffects.createPercentageRange(50, 100),
+            extraEffects.createTimeRange(200, 400)
+            )
+            myEffect.z = -1
+            extraEffects.createSpreadEffectAt(myEffect, sprite.x, sprite.y, 100, 19, 30)
+        }
+        for (let index = 0; index < randint(2, 5); index++) {
+            projectile = sprites.createProjectileFromSprite(img`
+                5 5 
+                5 5 
+                `, sprite, randint(-200, 200), randint(-200, 200))
+            sprites.setDataNumber(projectile, "Look", 1)
+        }
+    }
 })
 scene.onOverlapTile(SpriteKind.sword, assets.tile`myTile27`, function (sprite, location) {
     for (let value of tiles.getTilesByType(assets.tile`myTile18`)) {
@@ -4426,16 +4625,18 @@ scene.onOverlapTile(SpriteKind.sword, assets.tile`myTile27`, function (sprite, l
     }
     timer.throttle("attacksound", 500, function () {
         music.play(music.createSoundEffect(WaveShape.Noise, 1782, 357, 255, 115, 190, SoundExpressionEffect.None, InterpolationCurve.Logarithmic), music.PlaybackMode.InBackground)
-        myEffect2 = extraEffects.createCustomSpreadEffectData(
-        [12],
-        true,
-        extraEffects.createPresetSizeTable(ExtraEffectPresetShape.Spark),
-        extraEffects.createPercentageRange(50, 100),
-        extraEffects.createPercentageRange(50, 100),
-        extraEffects.createTimeRange(200, 400)
-        )
-        myEffect2.z = -3
-        extraEffects.createSpreadEffectAt(myEffect2, location.x, location.y, 500, 20)
+        if (particalson) {
+            myEffect2 = extraEffects.createCustomSpreadEffectData(
+            [12],
+            true,
+            extraEffects.createPresetSizeTable(ExtraEffectPresetShape.Spark),
+            extraEffects.createPercentageRange(50, 100),
+            extraEffects.createPercentageRange(50, 100),
+            extraEffects.createTimeRange(200, 400)
+            )
+            myEffect2.z = -3
+            extraEffects.createSpreadEffectAt(myEffect2, location.x, location.y, 500, 20)
+        }
     })
 })
 controller.left.onEvent(ControllerButtonEvent.Pressed, function () {
@@ -4470,7 +4671,7 @@ function loadlevels () {
     if (sprites.readDataNumber(hitbox, "levels-in") == 20) {
         tiles.setCurrentTilemap(tilemap`level54`)
     } else {
-        tiles.setCurrentTilemap(tileUtil.cloneMap(dessertlevels[randint(0, 4)]))
+        tiles.setCurrentTilemap(tileUtil.cloneMap(dessertlevels[randint(0, 5)]))
     }
     sprites.destroyAllSpritesOfKind(SpriteKind.Enemy)
     sprites.destroyAllSpritesOfKind(SpriteKind.text)
@@ -4492,44 +4693,138 @@ function loadlevels () {
     }
 }
 function shoot (num: number, num2: number) {
-    music.play(music.createSoundEffect(WaveShape.Square, 2040, 1, 130, 0, 200, SoundExpressionEffect.None, InterpolationCurve.Curve), music.PlaybackMode.InBackground)
-    projectile = sprites.createProjectileFromSprite(img`
-        5 5 
-        5 5 
-        `, hitbox, num, num2)
-    projectile.y += 6
-    if (dash) {
+    if (blockSettings.readNumber("Wepen") == 1) {
+        music.play(music.createSoundEffect(WaveShape.Square, 2040, 1, 130, 0, 200, SoundExpressionEffect.None, InterpolationCurve.Curve), music.PlaybackMode.InBackground)
+        projectile = sprites.createProjectileFromSprite(img`
+            5 5 
+            5 5 
+            `, hitbox, num, num2)
         projectile.y += 6
-    }
-    if (sprites.readDataNumber(hitbox, "multishot") >= 1) {
-        for (let index = 0; index < sprites.readDataNumber(hitbox, "multishot") * 2; index++) {
-            if (num == 0) {
-                projectile = sprites.createProjectileFromSprite(img`
-                    5 5 
-                    5 5 
-                    `, hitbox, randint(-100, 100), num2)
-                projectile.y += 6
-                if (dash) {
+        sprites.setDataNumber(projectile, "Look", 1)
+        if (dash) {
+            projectile.y += 6
+        }
+        if (sprites.readDataNumber(hitbox, "multishot") >= 1) {
+            for (let index = 0; index < sprites.readDataNumber(hitbox, "multishot") * 2; index++) {
+                if (num == 0) {
+                    projectile = sprites.createProjectileFromSprite(img`
+                        5 5 
+                        5 5 
+                        `, hitbox, randint(-100, 100), num2)
+                    sprites.setDataNumber(projectile, "Look", 1)
                     projectile.y += 6
-                }
-            } else if (num2 == 0) {
-                projectile = sprites.createProjectileFromSprite(img`
-                    5 5 
-                    5 5 
-                    `, hitbox, num, randint(-100, 100))
-                projectile.y += 6
-                if (dash) {
+                    if (dash) {
+                        projectile.y += 6
+                    }
+                } else if (num2 == 0) {
+                    projectile = sprites.createProjectileFromSprite(img`
+                        5 5 
+                        5 5 
+                        `, hitbox, num, randint(-100, 100))
+                    sprites.setDataNumber(projectile, "Look", 1)
                     projectile.y += 6
-                }
-            } else {
-                projectile = sprites.createProjectileFromSprite(img`
-                    5 5 
-                    5 5 
-                    `, hitbox, randint(-100, 100) + num, randint(-100, 100) + num2)
-                projectile.y += 6
-                if (dash) {
+                    if (dash) {
+                        projectile.y += 6
+                    }
+                } else {
+                    projectile = sprites.createProjectileFromSprite(img`
+                        5 5 
+                        5 5 
+                        `, hitbox, randint(-100, 100) + num, randint(-100, 100) + num2)
+                    sprites.setDataNumber(projectile, "Look", 1)
                     projectile.y += 6
+                    if (dash) {
+                        projectile.y += 6
+                    }
                 }
+            }
+        }
+    } else if (blockSettings.readNumber("Wepen") == 2) {
+        if (!(sprites.readDataNumber(hitbox, "shots") >= 4)) {
+            music.play(music.createSoundEffect(WaveShape.Square, 1600, 1, 255, 0, 300, SoundExpressionEffect.None, InterpolationCurve.Curve), music.PlaybackMode.InBackground)
+            projectile = sprites.createProjectileFromSprite(img`
+                2 2 
+                2 2 
+                `, hitbox, num, num2)
+            projectile.y += 6
+            if (dash) {
+                projectile.y += 6
+            }
+            sprites.setDataNumber(projectile, "Look", 2)
+            if (true) {
+                projectile.ay = 300
+                projectile.setFlag(SpriteFlag.DestroyOnWall, false)
+                projectile.setFlag(SpriteFlag.BounceOnWall, true)
+                projectile.lifespan = 2000
+            }
+            if (sprites.readDataNumber(hitbox, "multishot") >= 1) {
+                for (let index = 0; index < sprites.readDataNumber(hitbox, "multishot"); index++) {
+                    if (num == 0) {
+                        projectile = sprites.createProjectileFromSprite(img`
+                            2 2 
+                            2 2 
+                            `, hitbox, randint(-100, 100), num2)
+                        projectile.y += 6
+                        if (dash) {
+                            projectile.y += 6
+                        }
+                    } else if (num2 == 0) {
+                        projectile = sprites.createProjectileFromSprite(img`
+                            2 2 
+                            2 2 
+                            `, hitbox, num, randint(-100, 100))
+                        projectile.y += 6
+                        if (dash) {
+                            projectile.y += 6
+                        }
+                    } else {
+                        projectile = sprites.createProjectileFromSprite(img`
+                            2 2 
+                            2 2 
+                            `, hitbox, randint(-100, 100) + num, randint(-100, 100) + num2)
+                        projectile.y += 6
+                        if (dash) {
+                            projectile.y += 6
+                        }
+                    }
+                    if (true) {
+                        sprites.setDataNumber(projectile, "Look", 2)
+                        projectile.ay = 300
+                        projectile.setFlag(SpriteFlag.DestroyOnWall, false)
+                        projectile.setFlag(SpriteFlag.BounceOnWall, true)
+                        projectile.lifespan = 2000
+                    }
+                }
+            }
+            sprites.changeDataNumberBy(hitbox, "shots", 1)
+        } else {
+            if (spriteutils.isDestroyed(reloading)) {
+                reloading = statusbars.create(20, 4, StatusBarKind.Magic)
+                reloading.attachToSprite(hitbox)
+                reloading.value = 0
+                reloading.max = 4
+                timer.after(100, function () {
+                    if (!(spriteutils.isDestroyed(reloading))) {
+                        reloading.value += 1
+                    }
+                    timer.after(100, function () {
+                        if (!(spriteutils.isDestroyed(reloading))) {
+                            reloading.value += 1
+                        }
+                        timer.after(100, function () {
+                            if (!(spriteutils.isDestroyed(reloading))) {
+                                reloading.value += 1
+                            }
+                            timer.after(100, function () {
+                                if (!(spriteutils.isDestroyed(reloading))) {
+                                    reloading.value += 1
+                                    sprites.destroy(reloading)
+                                }
+                                sprites.setDataNumber(hitbox, "shots", 0)
+                            })
+                        })
+                    })
+                })
             }
         }
     }
@@ -4545,7 +4840,8 @@ scene.onOverlapTile(SpriteKind.Player, assets.tile`myTile54`, function (sprite, 
     }
 })
 function blasterloading () {
-    plaster = [img`
+    plaster = [
+    img`
         ................................
         ................................
         ................................
@@ -4578,7 +4874,8 @@ function blasterloading () {
         ............45..................
         ............55..................
         ................................
-        `, img`
+        `,
+    img`
         . . . . . . . . . . . . . . . . 
         . . . . . . . . . . . . . . . . 
         . . . . . . . . . . . . . . . . 
@@ -4595,8 +4892,62 @@ function blasterloading () {
         . . . . . . . . . . . . . . . . 
         . . . . . . . . . . . . . . . . 
         . . . . . . . . . . . . . . . . 
-        `]
-    blasterR = [img`
+        `,
+    img`
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ...........bb...................
+        ...........bb...................
+        ...........ddb..................
+        ...........db...................
+        ............b...................
+        ............b...................
+        ............b...................
+        ................................
+        `,
+    img`
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        `
+    ]
+    blasterR = [
+    img`
         ................................
         ................................
         ................................
@@ -4629,7 +4980,8 @@ function blasterloading () {
         ................................
         ................................
         ................................
-        `, img`
+        `,
+    img`
         ................................
         ................................
         ................................
@@ -4662,8 +5014,78 @@ function blasterloading () {
         ........b454545.................
         ........bbdd....................
         ................................
-        `]
-    BasterL = [img`
+        `,
+    img`
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        .............b..................
+        ...........bbdbbbb..............
+        ...........bbdd.................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        `,
+    img`
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ..........b.....................
+        ........bbdbbbb.................
+        ........bbdd....................
+        ................................
+        `
+    ]
+    BasterL = [
+    img`
         ................................
         ................................
         ................................
@@ -4696,7 +5118,8 @@ function blasterloading () {
         ................................
         ................................
         ................................
-        `, img`
+        `,
+    img`
         ................................
         ................................
         ................................
@@ -4729,8 +5152,78 @@ function blasterloading () {
         ...545454b......................
         ......ddbb......................
         ................................
-        `]
-    Baster_up = [img`
+        `,
+    img`
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ..........b.....................
+        ......bbbbdbb...................
+        .........ddbb...................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        `,
+    img`
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        .......b........................
+        ...bbbbdbb......................
+        ......ddbb......................
+        ................................
+        `
+    ]
+    Baster_up = [
+    img`
         ................................
         ................................
         ................................
@@ -4763,7 +5256,8 @@ function blasterloading () {
         ................................
         ................................
         ................................
-        `, img`
+        `,
+    img`
         ................................
         ................................
         ................................
@@ -4796,8 +5290,78 @@ function blasterloading () {
         ........4b......................
         ........bb......................
         ................................
-        `]
-    blasterLU = [img`
+        `,
+    img`
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ...........b....................
+        ...........b....................
+        ...........b....................
+        ...........bd...................
+        ..........bdd...................
+        ...........bb...................
+        ...........bb...................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        `,
+    img`
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ........b.......................
+        ........b.......................
+        ........b.......................
+        ........bd......................
+        .......bdd......................
+        ........bb......................
+        ........bb......................
+        ................................
+        `
+    ]
+    blasterLU = [
+    img`
         ................................
         ................................
         ................................
@@ -4830,7 +5394,8 @@ function blasterloading () {
         ................................
         ................................
         ................................
-        `, img`
+        `,
+    img`
         ................................
         ................................
         ................................
@@ -4863,8 +5428,78 @@ function blasterloading () {
         .......ddb......................
         ........bb......................
         ................................
-        `]
-    blaster_down_left = [img`
+        `,
+    img`
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ........b.......................
+        .........b......................
+        ..........b.b...................
+        ..........db....................
+        ..........ddb...................
+        ...........bb...................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        `,
+    img`
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        .....b..........................
+        ......b.........................
+        .......b.b......................
+        .......db.......................
+        .......ddb......................
+        ........bb......................
+        ................................
+        `
+    ]
+    blaster_down_left = [
+    img`
         ................................
         ................................
         ................................
@@ -4897,7 +5532,8 @@ function blasterloading () {
         .......55.......................
         ................................
         ................................
-        `, img`
+        `,
+    img`
         . . . . . . . . . . . . . . . . 
         . . . . . . . . . . . . . . . . 
         . . . . . . . . . . . . . . . . 
@@ -4914,8 +5550,62 @@ function blasterloading () {
         . . . . . . . . . . . . . . . . 
         . . . . . . . . . . . . . . . . 
         . . . . . . . . . . . . . . . . 
-        `]
-    BasterDR = [img`
+        `,
+    img`
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        .........b.bb...................
+        ..........bdb...................
+        .........bdd....................
+        ........b.......................
+        .......b........................
+        ................................
+        ................................
+        ................................
+        `,
+    img`
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        `
+    ]
+    BasterDR = [
+    img`
         ................................
         ................................
         ................................
@@ -4948,7 +5638,8 @@ function blasterloading () {
         ...............55...............
         ................................
         ................................
-        `, img`
+        `,
+    img`
         . . . . . . . . . . . . . . . . 
         . . . . . . . . . . . . . . . . 
         . . . . . . . . . . . . . . . . 
@@ -4965,8 +5656,62 @@ function blasterloading () {
         . . . . . . . . . . . . . . . . 
         . . . . . . . . . . . . . . . . 
         . . . . . . . . . . . . . . . . 
-        `]
-    BasterUR = [img`
+        `,
+    img`
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ...........bb.b.................
+        ...........bdb..................
+        ............ddb.................
+        ...............b................
+        ................b...............
+        ................................
+        ................................
+        ................................
+        `,
+    img`
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        `
+    ]
+    BasterUR = [
+    img`
         ................................
         ................................
         ................................
@@ -4999,7 +5744,8 @@ function blasterloading () {
         ................................
         ................................
         ................................
-        `, img`
+        `,
+    img`
         ................................
         ................................
         ................................
@@ -5032,77 +5778,139 @@ function blasterloading () {
         ........bdd.....................
         ........bb......................
         ................................
-        `]
+        `,
+    img`
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ...............b................
+        ..............b.................
+        ...........b.b..................
+        ............bd..................
+        ...........bdd..................
+        ...........bb...................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        `,
+    img`
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ................................
+        ............b...................
+        ...........b....................
+        ........b.b.....................
+        .........bd.....................
+        ........bdd.....................
+        ........bb......................
+        ................................
+        `
+    ]
 }
 sprites.onDestroyed(SpriteKind.Enemy, function (sprite) {
-    if (sprites.readDataNumber(sprite, "enemy") == 101) {
-        timer.background(function () {
-            game.setGameOverEffect(true, effects.confetti)
-            game.setGameOverMessage(true, "Thanks for playing more coming soon!!")
-        })
-    } else {
-        if (sprites.readDataBoolean(hitbox, "Inlevel")) {
-            if (Math.percentChance(10)) {
-                dropgoldheals("Chest", sprite, 3)
-            }
-            for (let index = 0; index < 1 + sprites.readDataNumber(hitbox, "More-Gold-drops"); index++) {
-                if (sprites.readDataNumber(sprite, "Lootchance") == 1) {
-                    if (Math.percentChance(50)) {
-                        dropgoldheals("gold", sprite, 1)
-                    }
-                    if (Math.percentChance(30)) {
-                        dropgoldheals("gold", sprite, 2)
-                    }
-                } else if (sprites.readDataNumber(sprite, "Lootchance") == 2) {
-                    if (Math.percentChance(70)) {
-                        dropgoldheals("gold", sprite, 1)
-                    }
-                    if (Math.percentChance(50)) {
-                        dropgoldheals("gold", sprite, 2)
-                    }
-                } else if (sprites.readDataNumber(sprite, "Lootchance") == 5) {
+    if (sprites.readDataBoolean(hitbox, "Inlevel")) {
+        if (Math.percentChance(10)) {
+            dropgoldheals("Chest", sprite, 3)
+        }
+        for (let index = 0; index < 1 + sprites.readDataNumber(hitbox, "More-Gold-drops"); index++) {
+            if (sprites.readDataNumber(sprite, "Lootchance") == 1) {
+                if (Math.percentChance(50)) {
+                    dropgoldheals("gold", sprite, 1)
+                }
+                if (Math.percentChance(30)) {
+                    dropgoldheals("gold", sprite, 2)
+                }
+            } else if (sprites.readDataNumber(sprite, "Lootchance") == 2) {
+                if (Math.percentChance(70)) {
+                    dropgoldheals("gold", sprite, 1)
+                }
+                if (Math.percentChance(50)) {
+                    dropgoldheals("gold", sprite, 2)
+                }
+            } else if (sprites.readDataNumber(sprite, "Lootchance") == 5) {
+                if (Math.percentChance(70)) {
+                    dropgoldheals("gold", sprite, 2)
+                }
+                if (Math.percentChance(50)) {
+                    dropgoldheals("gold", sprite, 3)
+                }
+            } else if (sprites.readDataNumber(sprite, "Lootchance") == 10) {
+                for (let index = 0; index < 2; index++) {
                     if (Math.percentChance(70)) {
                         dropgoldheals("gold", sprite, 2)
                     }
                     if (Math.percentChance(50)) {
                         dropgoldheals("gold", sprite, 3)
                     }
-                } else if (sprites.readDataNumber(sprite, "Lootchance") == 10) {
-                    for (let index = 0; index < 2; index++) {
-                        if (Math.percentChance(70)) {
-                            dropgoldheals("gold", sprite, 2)
-                        }
-                        if (Math.percentChance(50)) {
-                            dropgoldheals("gold", sprite, 3)
-                        }
-                        if (Math.percentChance(20)) {
-                            dropgoldheals("Heal", sprite, 1)
-                        }
+                    if (Math.percentChance(20)) {
+                        dropgoldheals("Heal", sprite, 1)
                     }
                 }
             }
-            for (let index = 0; index < sprites.readDataNumber(hitbox, "enemies-drop-more-HP"); index++) {
-                if (sprites.readDataNumber(sprite, "Lootchance") == 1) {
-                    if (Math.percentChance(20)) {
-                        dropgoldheals("Heal", sprite, 1)
-                    }
-                    if (Math.percentChance(5)) {
-                        dropgoldheals("Heal", sprite, 2)
-                    }
-                } else if (sprites.readDataNumber(sprite, "Lootchance") == 2) {
-                    if (Math.percentChance(20)) {
-                        dropgoldheals("Heal", sprite, 1)
-                    }
-                    if (Math.percentChance(5)) {
-                        dropgoldheals("Heal", sprite, 2)
-                    }
-                } else if (sprites.readDataNumber(sprite, "Lootchance") == 5) {
-                    if (Math.percentChance(20)) {
-                        dropgoldheals("Heal", sprite, 2)
-                    }
-                    if (Math.percentChance(5)) {
-                        dropgoldheals("Heal", sprite, 3)
-                    }
+        }
+        for (let index = 0; index < sprites.readDataNumber(hitbox, "enemies-drop-more-HP"); index++) {
+            if (sprites.readDataNumber(sprite, "Lootchance") == 1) {
+                if (Math.percentChance(20)) {
+                    dropgoldheals("Heal", sprite, 1)
+                }
+                if (Math.percentChance(5)) {
+                    dropgoldheals("Heal", sprite, 2)
+                }
+            } else if (sprites.readDataNumber(sprite, "Lootchance") == 2) {
+                if (Math.percentChance(20)) {
+                    dropgoldheals("Heal", sprite, 1)
+                }
+                if (Math.percentChance(5)) {
+                    dropgoldheals("Heal", sprite, 2)
+                }
+            } else if (sprites.readDataNumber(sprite, "Lootchance") == 5) {
+                if (Math.percentChance(20)) {
+                    dropgoldheals("Heal", sprite, 2)
+                }
+                if (Math.percentChance(5)) {
+                    dropgoldheals("Heal", sprite, 3)
                 }
             }
         }
@@ -5165,145 +5973,6 @@ controller.right.onEvent(ControllerButtonEvent.Pressed, function () {
             sprites.readDataSprite(op2, "CostS").setFlag(SpriteFlag.Invisible, false)
             op2.image.replace(12, 5)
             op1.image.replace(5, 12)
-        }
-    }
-})
-controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
-    if (inshop) {
-        if (sprites.readDataNumber(hitbox, "picked") == 2) {
-            if (sprites.readDataNumber(op2, "The cost") <= info.score()) {
-                info.changeScoreBy(0 - sprites.readDataNumber(op2, "The cost"))
-                sprites.changeDataNumberBy(hitbox, sprites.readDataString(op2, "Name2"), 1)
-                sprites.changeDataNumberBy(hitbox, "price", randint(0, 8))
-                leaveshop()
-            } else {
-                scene.cameraShake(4, 500)
-            }
-        } else if (sprites.readDataNumber(hitbox, "picked") == 3) {
-            if (sprites.readDataNumber(op3, "The cost") <= info.score()) {
-                info.changeScoreBy(0 - sprites.readDataNumber(op3, "The cost"))
-                sprites.changeDataNumberBy(hitbox, sprites.readDataString(op3, "Name2"), 1)
-                sprites.changeDataNumberBy(hitbox, "price", randint(0, 8))
-                leaveshop()
-            } else {
-                scene.cameraShake(4, 500)
-            }
-        } else if (sprites.readDataNumber(hitbox, "picked") == 1) {
-            if (sprites.readDataNumber(op1, "The cost") <= info.score()) {
-                info.changeScoreBy(0 - sprites.readDataNumber(op1, "The cost"))
-                sprites.changeDataNumberBy(hitbox, sprites.readDataString(op1, "Name2"), 1)
-                sprites.changeDataNumberBy(hitbox, "price", randint(0, 8))
-                leaveshop()
-            } else {
-                scene.cameraShake(4, 500)
-            }
-        }
-    } else {
-        if (!(in_menus)) {
-            for (let value of spriteutils.getSpritesWithin(SpriteKind.shop, 40, mySprite)) {
-                inshop = true
-                mySprite.setFlag(SpriteFlag.Invisible, true)
-                layer_one.setFlag(SpriteFlag.Invisible, true)
-                layer_2.setFlag(SpriteFlag.Invisible, true)
-                controller.moveSprite(hitbox, 0, 0)
-                sprites.setDataNumber(hitbox, "picked", 2)
-                scene.cameraFollowSprite(value)
-                Zoom.SetZoomFilter(2, Mode.Center)
-                for (let value of tiles.getTilesByType(assets.tile`myTile64`)) {
-                    pickaupgrade = randint(0, numbofupgrades)
-                    op2 = sprites.create(list_of_upgreads[pickaupgrade].clone(), SpriteKind.background)
-                    tiles.placeOnTile(op2, value)
-                    tiles.setTileAt(value, assets.tile`myTile`)
-                    sprites.setDataSprite(op2, "name", textsprite.create("" + listofupgrades[pickaupgrade] + "-" + (sprites.readDataNumber(hitbox, listofupgrades[pickaupgrade]) + 1), 0, 5))
-                    tiles.placeOnTile(sprites.readDataSprite(op2, "name"), value.getNeighboringLocation(CollisionDirection.Bottom))
-                    sprites.setDataString(op2, "Name2", listofupgrades[pickaupgrade])
-                    op2.image.replace(12, 5)
-                    sprites.setDataSprite(op2, "CostS", textsprite.create("Cost:" + convertToText(sprites.readDataNumber(hitbox, "price") + list_of_pirces[pickaupgrade]), 0, 4))
-                    tiles.placeOnTile(sprites.readDataSprite(op2, "CostS"), value.getNeighboringLocation(CollisionDirection.Top))
-                    sprites.setDataNumber(op2, "The cost", sprites.readDataNumber(hitbox, "price") + list_of_pirces[pickaupgrade])
-                }
-                for (let value of tiles.getTilesByType(assets.tile`myTile65`)) {
-                    pickaupgrade = randint(0, numbofupgrades)
-                    op1 = sprites.create(list_of_upgreads[pickaupgrade].clone(), SpriteKind.background)
-                    tiles.placeOnTile(op1, value)
-                    tiles.setTileAt(value, assets.tile`myTile`)
-                    sprites.setDataSprite(op1, "name", textsprite.create("" + listofupgrades[pickaupgrade] + "-" + (sprites.readDataNumber(hitbox, listofupgrades[pickaupgrade]) + 1), 0, 5))
-                    sprites.readDataSprite(op1, "name").setFlag(SpriteFlag.Invisible, true)
-                    sprites.setDataString(op1, "Name2", listofupgrades[pickaupgrade])
-                    tiles.placeOnTile(sprites.readDataSprite(op1, "name"), op2.tilemapLocation().getNeighboringLocation(CollisionDirection.Bottom))
-                    sprites.setDataSprite(op1, "CostS", textsprite.create("Cost:" + convertToText(sprites.readDataNumber(hitbox, "price") + list_of_pirces[pickaupgrade]), 0, 4))
-                    tiles.placeOnTile(sprites.readDataSprite(op1, "CostS"), op2.tilemapLocation().getNeighboringLocation(CollisionDirection.Top))
-                    sprites.setDataNumber(op1, "The cost", sprites.readDataNumber(hitbox, "price") + list_of_pirces[pickaupgrade])
-                    sprites.readDataSprite(op1, "CostS").setFlag(SpriteFlag.Invisible, true)
-                }
-                for (let value of tiles.getTilesByType(assets.tile`myTile69`)) {
-                    pickaupgrade = randint(0, numbofupgrades)
-                    op3 = sprites.create(list_of_upgreads[pickaupgrade].clone(), SpriteKind.background)
-                    tiles.placeOnTile(op3, value)
-                    tiles.setTileAt(value, assets.tile`myTile`)
-                    sprites.setDataSprite(op3, "name", textsprite.create("" + listofupgrades[pickaupgrade] + "-" + (sprites.readDataNumber(hitbox, listofupgrades[pickaupgrade]) + 1), 0, 5))
-                    sprites.readDataSprite(op3, "name").setFlag(SpriteFlag.Invisible, true)
-                    sprites.setDataString(op3, "Name2", listofupgrades[pickaupgrade])
-                    tiles.placeOnTile(sprites.readDataSprite(op3, "name"), op2.tilemapLocation().getNeighboringLocation(CollisionDirection.Bottom))
-                    sprites.setDataSprite(op3, "CostS", textsprite.create("Cost:" + convertToText(sprites.readDataNumber(hitbox, "price") + list_of_pirces[pickaupgrade]), 0, 4))
-                    tiles.placeOnTile(sprites.readDataSprite(op3, "CostS"), op2.tilemapLocation().getNeighboringLocation(CollisionDirection.Top))
-                    sprites.setDataNumber(op3, "The cost", sprites.readDataNumber(hitbox, "price") + list_of_pirces[pickaupgrade])
-                    sprites.readDataSprite(op3, "CostS").setFlag(SpriteFlag.Invisible, true)
-                }
-            }
-            if (!(inshop)) {
-                if (hitbox.tileKindAt(TileDirection.Center, assets.tile`myTile43`)) {
-                    if (inhubworld) {
-                        inhubworld = false
-                        sprites.setDataNumber(hitbox, "levelsdoing", 20)
-                        sprites.setDataNumber(hitbox, "levels-in", 0)
-                        sprites.destroyAllSpritesOfKind(SpriteKind.text)
-                        sprites.destroy(textSprite)
-                        levelsdisplay = textsprite.create("" + convertToText(sprites.readDataNumber(hitbox, "levelsdoing")) + "/" + convertToText(sprites.readDataNumber(hitbox, "levels-in")))
-                        levelsdisplay.setScale(2, ScaleAnchor.Middle)
-                        levelsdisplay.setFlag(SpriteFlag.RelativeToCamera, true)
-                        levelsdisplay.setPosition(30, 230)
-                        levelsdisplay.setKind(SpriteKind.allevels)
-                        playtrack = 0
-                        music.stopAllSounds()
-                        playtrack = 2
-                        loadlevels()
-                    }
-                } else if (can_be_in_menu && hitbox.tileKindAt(TileDirection.Center, assets.tile`myTile46`)) {
-                    if (inhubworld) {
-                        can_be_in_menu = false
-                        in_menus = true
-                        controller.moveSprite(hitbox, 0, 0)
-                        timer.background(function () {
-                            changelog()
-                            in_menus = false
-                            controller.moveSprite(hitbox, 100, 0)
-                            Zoom.SetZoomFilter(1, Mode.Center)
-                            timer.after(500, function () {
-                                can_be_in_menu = true
-                            })
-                        })
-                    }
-                } else {
-                    if (sprites.readDataNumber(layer_one, "gun der") == 1) {
-                        shoot(0, -200)
-                    } else if (sprites.readDataNumber(layer_one, "gun der") == 2) {
-                        shoot(-200, 0)
-                    } else if (sprites.readDataNumber(layer_one, "gun der") == 3) {
-                        shoot(200, 0)
-                    } else if (sprites.readDataNumber(layer_one, "gun der") == 4) {
-                        shoot(0, 200)
-                    } else if (sprites.readDataNumber(layer_one, "gun der") == 5) {
-                        shoot(-200, -200)
-                    } else if (sprites.readDataNumber(layer_one, "gun der") == 6) {
-                        shoot(200, -200)
-                    } else if (sprites.readDataNumber(layer_one, "gun der") == 7) {
-                        shoot(-200, 200)
-                    } else if (sprites.readDataNumber(layer_one, "gun der") == 8) {
-                        shoot(200, 200)
-                    }
-                }
-            }
         }
     }
 })
@@ -5538,6 +6207,14 @@ function BossStart () {
     tileUtil.replaceAllTiles(assets.tile`myTile12`, assets.tile`transparency16`)
 }
 statusbars.onZero(StatusBarKind.EnemyHealth, function (status) {
+    if (sprites.readDataNumber(status.spriteAttachedTo(), "enemy") == 101) {
+        timer.after(500, function () {
+            blockSettings.writeNumber("Bossgun", 1)
+            game.setGameOverEffect(true, effects.confetti)
+            game.setGameOverMessage(true, "Thanks for playing more coming soon!!")
+            game.gameOver(true)
+        })
+    }
     sprites.destroy(status.spriteAttachedTo())
 })
 sprites.onDestroyed(SpriteKind.Emprject, function (sprite) {
@@ -5561,8 +6238,10 @@ sprites.onDestroyed(SpriteKind.Emprject, function (sprite) {
         extraEffects.createTimeRange(200, 400)
         )
     }
-    myEffect.z = 0
-    extraEffects.createSpreadEffectAt(myEffect, sprite.x, sprite.y, 100, 19, 30)
+    if (particalson) {
+        myEffect.z = 0
+        extraEffects.createSpreadEffectAt(myEffect, sprite.x, sprite.y, 100, 19, 30)
+    }
     if (sprites.readDataNumber(sprite, "Blast") == 2) {
         for (let index = 0; index < randint(1, 5); index++) {
             Eshoot(randint(-200, 200), randint(-200, 200), 2, sprite)
@@ -5574,6 +6253,32 @@ sprites.onOverlap(SpriteKind.sword, SpriteKind.Enemy, function (sprite, otherSpr
     statusbars.getStatusBarAttachedTo(StatusBarKind.EnemyHealth, otherSprite).value += -1 - sprites.readDataNumber(hitbox, "sword-attack-up")
     pause(500)
 })
+function openingchest () {
+    list = [miniMenu.createMenuItem("Blaster")]
+    if (blockSettings.exists("Bossgun")) {
+        list.push(miniMenu.createMenuItem("Bandit Blaster"))
+    }
+    myMenu = miniMenu.createMenuFromArray(list)
+    for (let value of tiles.getTilesByType(assets.tile`myTile32`)) {
+        tiles.placeOnTile(myMenu, value.getNeighboringLocation(CollisionDirection.Top).getNeighboringLocation(CollisionDirection.Right))
+    }
+    sprites.setDataBoolean(hitbox, "inchest", true)
+    myMenu.setButtonEventsEnabled(true)
+    while (sprites.readDataBoolean(hitbox, "inchest")) {
+        myMenu.onButtonPressed(controller.A, function (selection, selectedIndex) {
+            if (selection == "Bandit Blaster") {
+                blockSettings.writeNumber("Wepen", 2)
+                sprites.setDataBoolean(hitbox, "inchest", false)
+            } else if (selection == "Blaster") {
+                blockSettings.writeNumber("Wepen", 1)
+                sprites.setDataBoolean(hitbox, "inchest", false)
+            }
+        })
+        pause(10)
+    }
+    myMenu.setButtonEventsEnabled(false)
+    myMenu.close()
+}
 controller.down.onEvent(ControllerButtonEvent.Pressed, function () {
     if (!(in_menus)) {
         if (!(inshop)) {
@@ -5758,9 +6463,11 @@ sprites.onOverlap(SpriteKind.Projectile, SpriteKind.Enemy, function (sprite, oth
     statusbars.getStatusBarAttachedTo(StatusBarKind.EnemyHealth, otherSprite).value += -1
 })
 sprites.onOverlap(SpriteKind.Player, SpriteKind.heal, function (sprite, otherSprite) {
-    info.changeLifeBy(sprites.readDataNumber(otherSprite, "hold"))
+    if (!(info.life() >= 20)) {
+        info.changeLifeBy(sprites.readDataNumber(otherSprite, "hold"))
+        music.play(music.melodyPlayable(music.jumpUp), music.PlaybackMode.InBackground)
+    }
     sprites.destroy(otherSprite)
-    music.play(music.melodyPlayable(music.jumpUp), music.PlaybackMode.InBackground)
 })
 scene.onOverlapTile(SpriteKind.Player, sprites.dungeon.collectibleInsignia, function (sprite, location) {
     blockSettings.writeNumber("main", 0)
@@ -5830,8 +6537,9 @@ controller.down.onEvent(ControllerButtonEvent.Released, function () {
 })
 let numb_of_swords = 0
 let moveset = 0
+let myMenu: miniMenu.MenuSprite = null
+let list: miniMenu.MenuItem[] = []
 let Boss: Sprite = null
-let pickaupgrade = 0
 let cam: Sprite = null
 let BasterUR: Image[] = []
 let BasterDR: Image[] = []
@@ -5842,24 +6550,26 @@ let BasterL: Image[] = []
 let blasterR: Image[] = []
 let plaster: Image[] = []
 let projectile: Sprite = null
-let levelsdisplay: TextSprite = null
-let op3: Sprite = null
-let op2: Sprite = null
-let op1: Sprite = null
 let myEffect: SpreadEffectData = null
 let projectile2: Sprite = null
 let Goldcoin: Sprite = null
 let statusbar: StatusBarSprite = null
 let rat: Sprite = null
-let numbofupgrades = 0
-let list_of_pirces: number[] = []
-let list_of_upgreads: Image[] = []
 let shop: Sprite = null
-let textSprite: TextSprite = null
 let backgroundtext: Sprite = null
 let myEffect2: SpreadEffectData = null
 let anamion: Image[] = []
 let cloneimage: Image = null
+let levelsdisplay: TextSprite = null
+let textSprite: TextSprite = null
+let list_of_pirces: number[] = []
+let list_of_upgreads: Image[] = []
+let numbofupgrades = 0
+let pickaupgrade = 0
+let op1: Sprite = null
+let op3: Sprite = null
+let op2: Sprite = null
+let reloading: StatusBarSprite = null
 let swordsprite: Sprite = null
 let swrodcombo = false
 let showrdnub = 0
@@ -5884,21 +6594,24 @@ let random_gen2: tiles.TileMapData[] = []
 let random_gen01: tiles.TileMapData[] = []
 let dessertlevels: tiles.TileMapData[] = []
 let inhubworld = false
-if (true) {
+let particalson = false
+if (false) {
     blockSettings.clear()
 }
-music.setVolume(50)
 namespace userconfig {
     export const ARCADE_SCREEN_WIDTH = 320
     export const ARCADE_SCREEN_HEIGHT = 240
 }
+music.setVolume(50)
+particalson = true
 inhubworld = true
 dessertlevels = [
 tilemap`level5`,
 tilemap`level16`,
 tilemap`level20`,
 tilemap`level26`,
-tilemap`level53`
+tilemap`level53`,
+tilemap`level57`
 ]
 random_gen01 = [
 tilemap`level8`,
@@ -6067,12 +6780,12 @@ layer_one = sprites.create(img`
     ................................
     ................................
     ...........bb...................
-    ...........b4...................
-    ...........d54..................
-    ...........d45..................
-    ............54..................
-    ............45..................
-    ............55..................
+    ...........bb...................
+    ...........dd...................
+    ...........dd...................
+    ................................
+    ................................
+    ................................
     ................................
     `, SpriteKind.onplayer)
 sprites.setDataNumber(layer_one, "gun der", 1)
@@ -6150,8 +6863,7 @@ listofupgrades = [
 "More-dash-damge",
 "More-slide-speed",
 "More-Gold-drops",
-"Rapid-fire",
-"Magnetism"
+"Rapid-fire"
 ]
 for (let value of listofupgrades) {
     sprites.setDataNumber(hitbox, value, 0)
@@ -6159,6 +6871,8 @@ for (let value of listofupgrades) {
 sprites.setDataBoolean(hitbox, "Inlevel", false)
 if (blockSettings.exists("main")) {
     main_lobby()
+} else {
+    blockSettings.writeNumber("Wepen", 1)
 }
 if (false) {
     sprites.setDataNumber(hitbox, "More-slide-speed", 5)
@@ -6601,6 +7315,11 @@ forever(function () {
         }
     }
 })
+game.onUpdate(function () {
+    if (in_menus) {
+        Zoom.SetZoomFilter(2, Mode.Right)
+    }
+})
 forever(function () {
     if (sprites.readDataNumber(hitbox, "Rapid-fire") >= 1) {
         if (controller.A.isPressed()) {
@@ -6634,7 +7353,7 @@ forever(function () {
         if (mySprite.tileKindAt(TileDirection.Center, assets.tile`myTile46`)) {
             textSprite.setText("Change log")
         } else if (mySprite.tileKindAt(TileDirection.Center, assets.tile`myTile32`)) {
-            textSprite.setText("Coming soon")
+            textSprite.setText("Open Chest")
         } else if (mySprite.tileKindAt(TileDirection.Center, assets.tile`myTile44`)) {
             textSprite.setText("Coming soon")
         } else if (mySprite.tileKindAt(TileDirection.Center, assets.tile`myTile43`)) {
@@ -6652,69 +7371,88 @@ forever(function () {
     }
     console.logValue("sword", numb_of_swords)
     for (let value of sprites.allOfKind(SpriteKind.Emprject)) {
-        if (sprites.readDataNumber(value, "color") == 2) {
-            myEffect = extraEffects.createCustomSpreadEffectData(
-            extraEffects.createPresetColorTable(ExtraEffectPresetColor.Fire),
-            true,
-            extraEffects.createPresetSizeTable(ExtraEffectPresetShape.Spark),
-            extraEffects.createPercentageRange(50, 100),
-            extraEffects.createPercentageRange(50, 100),
-            extraEffects.createTimeRange(200, 400)
-            )
-        } else {
-            myEffect = extraEffects.createCustomSpreadEffectData(
-            extraEffects.createPresetColorTable(ExtraEffectPresetColor.Toxic),
-            true,
-            extraEffects.createPresetSizeTable(ExtraEffectPresetShape.Spark),
-            extraEffects.createPercentageRange(50, 100),
-            extraEffects.createPercentageRange(50, 100),
-            extraEffects.createTimeRange(200, 400)
-            )
+        if (particalson) {
+            if (sprites.readDataNumber(value, "color") == 2) {
+                myEffect = extraEffects.createCustomSpreadEffectData(
+                extraEffects.createPresetColorTable(ExtraEffectPresetColor.Fire),
+                true,
+                extraEffects.createPresetSizeTable(ExtraEffectPresetShape.Spark),
+                extraEffects.createPercentageRange(50, 100),
+                extraEffects.createPercentageRange(50, 100),
+                extraEffects.createTimeRange(200, 400)
+                )
+            } else {
+                myEffect = extraEffects.createCustomSpreadEffectData(
+                extraEffects.createPresetColorTable(ExtraEffectPresetColor.Toxic),
+                true,
+                extraEffects.createPresetSizeTable(ExtraEffectPresetShape.Spark),
+                extraEffects.createPercentageRange(50, 100),
+                extraEffects.createPercentageRange(50, 100),
+                extraEffects.createTimeRange(200, 400)
+                )
+            }
+            myEffect.z = 0
+            extraEffects.createSpreadEffectOnAnchor(value, myEffect, 1, 2, 3)
         }
-        myEffect.z = 0
-        extraEffects.createSpreadEffectOnAnchor(value, myEffect, 1, 2, 3)
     }
     for (let value of sprites.allOfKind(SpriteKind.Projectile)) {
-        myEffect = extraEffects.createCustomSpreadEffectData(
-        extraEffects.createPresetColorTable(ExtraEffectPresetColor.Electric),
-        true,
-        extraEffects.createPresetSizeTable(ExtraEffectPresetShape.Spark),
-        extraEffects.createPercentageRange(50, 100),
-        extraEffects.createPercentageRange(50, 100),
-        extraEffects.createTimeRange(200, 400)
-        )
-        myEffect.z = -1
-        extraEffects.createSpreadEffectOnAnchor(value, myEffect, 1, 2, 3)
-        if (sprites.readDataNumber(hitbox, "homing-blasts") >= 1) {
-            sprites.setDataBoolean(value, "Fallowing", false)
-            if (sprites.readDataNumber(hitbox, "homing-blasts") >= 5) {
-                if (!(sprites.readDataBoolean(value, "Fallowing"))) {
-                    for (let theemneymy of spriteutils.getSpritesWithin(SpriteKind.Enemy, sprites.readDataNumber(hitbox, "homing-blasts") * 10, value)) {
-                        value.follow(theemneymy, 220)
-                        sprites.setDataBoolean(value, "Fallowing", true)
-                    }
-                }
-            } else {
-                for (let theemneymy of spriteutils.getSpritesWithin(SpriteKind.Enemy, 50, value)) {
+        if (sprites.readDataNumber(value, "Look") == 1) {
+            if (particalson) {
+                myEffect = extraEffects.createCustomSpreadEffectData(
+                extraEffects.createPresetColorTable(ExtraEffectPresetColor.Electric),
+                true,
+                extraEffects.createPresetSizeTable(ExtraEffectPresetShape.Spark),
+                extraEffects.createPercentageRange(50, 100),
+                extraEffects.createPercentageRange(50, 100),
+                extraEffects.createTimeRange(200, 400)
+                )
+                myEffect.z = -1
+                extraEffects.createSpreadEffectOnAnchor(value, myEffect, 1, 2, 3)
+            }
+            if (sprites.readDataNumber(hitbox, "homing-blasts") >= 1) {
+                sprites.setDataBoolean(value, "Fallowing", false)
+                if (sprites.readDataNumber(hitbox, "homing-blasts") >= 5) {
                     if (!(sprites.readDataBoolean(value, "Fallowing"))) {
-                        if (sprites.readDataNumber(hitbox, "homing-blasts") == 1) {
-                            value.follow(theemneymy, 100)
-                        } else if (sprites.readDataNumber(hitbox, "homing-blasts") == 2) {
-                            value.follow(theemneymy, 150)
-                        } else if (sprites.readDataNumber(hitbox, "homing-blasts") == 3) {
-                            value.follow(theemneymy, 170)
-                        } else if (sprites.readDataNumber(hitbox, "homing-blasts") >= 3) {
-                            value.follow(theemneymy, 200)
-                        } else {
-                            value.follow(theemneymy, 210)
+                        for (let theemneymy of spriteutils.getSpritesWithin(SpriteKind.Enemy, sprites.readDataNumber(hitbox, "homing-blasts") * 10, value)) {
+                            value.follow(theemneymy, 220)
+                            sprites.setDataBoolean(value, "Fallowing", true)
                         }
-                        sprites.setDataBoolean(value, "Fallowing", true)
+                    }
+                } else {
+                    for (let theemneymy of spriteutils.getSpritesWithin(SpriteKind.Enemy, 50, value)) {
+                        if (!(sprites.readDataBoolean(value, "Fallowing"))) {
+                            if (sprites.readDataNumber(hitbox, "homing-blasts") == 1) {
+                                value.follow(theemneymy, 100)
+                            } else if (sprites.readDataNumber(hitbox, "homing-blasts") == 2) {
+                                value.follow(theemneymy, 150)
+                            } else if (sprites.readDataNumber(hitbox, "homing-blasts") == 3) {
+                                value.follow(theemneymy, 170)
+                            } else if (sprites.readDataNumber(hitbox, "homing-blasts") >= 3) {
+                                value.follow(theemneymy, 200)
+                            } else {
+                                value.follow(theemneymy, 210)
+                            }
+                            sprites.setDataBoolean(value, "Fallowing", true)
+                        }
                     }
                 }
             }
-        }
-        if (value.vy == 0 && value.vx == 0) {
-            sprites.destroy(value)
+            if (value.vy == 0 && value.vx == 0) {
+                sprites.destroy(value)
+            }
+        } else if (sprites.readDataNumber(value, "Look") == 2) {
+            if (particalson) {
+                myEffect = extraEffects.createCustomSpreadEffectData(
+                extraEffects.createPresetColorTable(ExtraEffectPresetColor.Fire),
+                true,
+                extraEffects.createPresetSizeTable(ExtraEffectPresetShape.Spark),
+                extraEffects.createPercentageRange(50, 100),
+                extraEffects.createPercentageRange(50, 100),
+                extraEffects.createTimeRange(200, 400)
+                )
+                myEffect.z = -1
+                extraEffects.createSpreadEffectOnAnchor(value, myEffect, 1, 2, 3)
+            }
         }
     }
     for (let value of spriteutils.getSpritesWithin(SpriteKind.text, 50, hitbox)) {
@@ -9033,11 +9771,6 @@ forever(function () {
         }
     }
 })
-game.onUpdate(function () {
-    if (in_menus) {
-        Zoom.SetZoomFilter(2, Mode.Right)
-    }
-})
 forever(function () {
     if (playtrack == 1) {
     	
@@ -9205,6 +9938,11 @@ forever(function () {
                 `))
         }
     }
+    if (blockSettings.readNumber("Wepen") == 1) {
+        sprites.setDataNumber(layer_one, "assetone", 0)
+    } else if (blockSettings.readNumber("Wepen") == 2) {
+        sprites.setDataNumber(layer_one, "assetone", 2)
+    }
     if (dash) {
         if (!(controller.down.isPressed())) {
             stopdash()
@@ -9218,46 +9956,48 @@ forever(function () {
                 stopdash()
             }
         }
-        if (RL) {
-            extraEffects.createSpreadEffectAt(extraEffects.createSingleColorSpreadEffectData(11, ExtraEffectPresetShape.Spark), 7 + hitbox.x, 15 + hitbox.y, 100, 1, 3)
-        } else {
-            extraEffects.createSpreadEffectAt(extraEffects.createSingleColorSpreadEffectData(11, ExtraEffectPresetShape.Spark), -9 + hitbox.x, 15 + hitbox.y, 100, 1, 3)
+        if (particalson) {
+            if (RL) {
+                extraEffects.createSpreadEffectAt(extraEffects.createSingleColorSpreadEffectData(11, ExtraEffectPresetShape.Spark), 7 + hitbox.x, 15 + hitbox.y, 100, 1, 3)
+            } else {
+                extraEffects.createSpreadEffectAt(extraEffects.createSingleColorSpreadEffectData(11, ExtraEffectPresetShape.Spark), -9 + hitbox.x, 15 + hitbox.y, 100, 1, 3)
+            }
         }
         if (controller.left.isPressed() && controller.up.isPressed()) {
             sprites.setDataNumber(layer_one, "gun der", 5)
             if (RL) {
-                layer_one.setImage(blasterLU[1])
+                layer_one.setImage(blasterLU[sprites.readDataNumber(layer_one, "assetone") + 1])
             } else {
-                layer_one.setImage(flip_Image(BasterUR[1]))
+                layer_one.setImage(flip_Image(BasterUR[sprites.readDataNumber(layer_one, "assetone") + 1]))
             }
         } else if (controller.right.isPressed() && controller.up.isPressed()) {
             sprites.setDataNumber(layer_one, "gun der", 6)
             if (RL) {
-                layer_one.setImage(BasterUR[1])
+                layer_one.setImage(BasterUR[sprites.readDataNumber(layer_one, "assetone") + 1])
             } else {
-                layer_one.setImage(flip_Image(blasterLU[1]))
+                layer_one.setImage(flip_Image(blasterLU[sprites.readDataNumber(layer_one, "assetone") + 1]))
             }
         } else {
             if (controller.up.isPressed()) {
                 sprites.setDataNumber(layer_one, "gun der", 1)
                 if (RL) {
-                    layer_one.setImage(Baster_up[1])
+                    layer_one.setImage(Baster_up[sprites.readDataNumber(layer_one, "assetone") + 1])
                 } else {
-                    layer_one.setImage(flip_Image(Baster_up[1]))
+                    layer_one.setImage(flip_Image(Baster_up[sprites.readDataNumber(layer_one, "assetone") + 1]))
                 }
             } else if (controller.left.isPressed()) {
                 sprites.setDataNumber(layer_one, "gun der", 2)
                 if (RL) {
-                    layer_one.setImage(BasterL[1])
+                    layer_one.setImage(BasterL[sprites.readDataNumber(layer_one, "assetone") + 1])
                 } else {
-                    layer_one.setImage(flip_Image(blasterR[1]))
+                    layer_one.setImage(flip_Image(blasterR[sprites.readDataNumber(layer_one, "assetone") + 1]))
                 }
             } else if (controller.right.isPressed()) {
                 sprites.setDataNumber(layer_one, "gun der", 3)
                 if (RL) {
-                    layer_one.setImage(blasterR[1])
+                    layer_one.setImage(blasterR[sprites.readDataNumber(layer_one, "assetone") + 1])
                 } else {
-                    layer_one.setImage(flip_Image(BasterL[1]))
+                    layer_one.setImage(flip_Image(BasterL[sprites.readDataNumber(layer_one, "assetone") + 1]))
                 }
             }
         }
@@ -9270,59 +10010,59 @@ forever(function () {
         if (controller.left.isPressed() && controller.up.isPressed()) {
             sprites.setDataNumber(layer_one, "gun der", 5)
             if (RL) {
-                layer_one.setImage(blasterLU[0])
+                layer_one.setImage(blasterLU[sprites.readDataNumber(layer_one, "assetone")])
             } else {
-                layer_one.setImage(flip_Image(BasterUR[0]))
+                layer_one.setImage(flip_Image(BasterUR[sprites.readDataNumber(layer_one, "assetone")]))
             }
         } else if (controller.left.isPressed() && controller.down.isPressed()) {
             sprites.setDataNumber(layer_one, "gun der", 7)
             if (RL) {
-                layer_one.setImage(blaster_down_left[0])
+                layer_one.setImage(blaster_down_left[sprites.readDataNumber(layer_one, "assetone")])
             } else {
-                layer_one.setImage(flip_Image(BasterDR[0]))
+                layer_one.setImage(flip_Image(BasterDR[sprites.readDataNumber(layer_one, "assetone")]))
             }
         } else if (controller.right.isPressed() && controller.down.isPressed()) {
             sprites.setDataNumber(layer_one, "gun der", 8)
             if (RL) {
-                layer_one.setImage(BasterDR[0])
+                layer_one.setImage(BasterDR[sprites.readDataNumber(layer_one, "assetone")])
             } else {
-                layer_one.setImage(flip_Image(blaster_down_left[0]))
+                layer_one.setImage(flip_Image(blaster_down_left[sprites.readDataNumber(layer_one, "assetone")]))
             }
         } else if (controller.right.isPressed() && controller.up.isPressed()) {
             sprites.setDataNumber(layer_one, "gun der", 6)
             if (RL) {
-                layer_one.setImage(BasterUR[0])
+                layer_one.setImage(BasterUR[sprites.readDataNumber(layer_one, "assetone")])
             } else {
-                layer_one.setImage(flip_Image(blasterLU[0]))
+                layer_one.setImage(flip_Image(blasterLU[sprites.readDataNumber(layer_one, "assetone")]))
             }
         } else {
             if (controller.down.isPressed()) {
                 sprites.setDataNumber(layer_one, "gun der", 4)
                 if (RL) {
-                    layer_one.setImage(plaster[0])
+                    layer_one.setImage(plaster[sprites.readDataNumber(layer_one, "assetone")])
                 } else {
-                    layer_one.setImage(flip_Image(plaster[0]))
+                    layer_one.setImage(flip_Image(plaster[sprites.readDataNumber(layer_one, "assetone")]))
                 }
             } else if (controller.up.isPressed()) {
                 sprites.setDataNumber(layer_one, "gun der", 1)
                 if (RL) {
-                    layer_one.setImage(Baster_up[0])
+                    layer_one.setImage(Baster_up[sprites.readDataNumber(layer_one, "assetone")])
                 } else {
-                    layer_one.setImage(flip_Image(Baster_up[0]))
+                    layer_one.setImage(flip_Image(Baster_up[sprites.readDataNumber(layer_one, "assetone")]))
                 }
             } else if (controller.left.isPressed()) {
                 sprites.setDataNumber(layer_one, "gun der", 2)
                 if (RL) {
-                    layer_one.setImage(BasterL[0])
+                    layer_one.setImage(BasterL[sprites.readDataNumber(layer_one, "assetone")])
                 } else {
-                    layer_one.setImage(flip_Image(blasterR[0]))
+                    layer_one.setImage(flip_Image(blasterR[sprites.readDataNumber(layer_one, "assetone")]))
                 }
             } else if (controller.right.isPressed()) {
                 sprites.setDataNumber(layer_one, "gun der", 3)
                 if (RL) {
-                    layer_one.setImage(blasterR[0])
+                    layer_one.setImage(blasterR[sprites.readDataNumber(layer_one, "assetone")])
                 } else {
-                    layer_one.setImage(flip_Image(blasterR[0]))
+                    layer_one.setImage(flip_Image(blasterR[sprites.readDataNumber(layer_one, "assetone")]))
                 }
             }
         }

@@ -1,5 +1,5 @@
 {
-    "name": "Blast and Slash",
+    "name": "Blast and Slash 1.1 preview",
     "description": "",
     "dependencies": {
         "device": "*",
@@ -17,7 +17,8 @@
         "Desert Dead": "pub:81060-33361-98071-70680",
         "settings-blocks": "github:microsoft/pxt-settings-blocks#v1.0.0",
         "Menu Theme": "pub:75311-91892-45251-32159",
-        "arcade-story": "github:microsoft/arcade-storytelling#v1.0.3"
+        "arcade-story": "github:microsoft/arcade-storytelling#v1.0.3",
+        "arcade-mini-menu": "github:riknoll/arcade-mini-menu#v0.0.1"
     },
     "files": [
         "main.blocks",
