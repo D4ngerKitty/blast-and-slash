@@ -1,5 +1,6 @@
 {
     "name": "Blast and Slash 1.1 preview",
+    "version": "1.0.0",
     "description": "",
     "dependencies": {
         "device": "*",
