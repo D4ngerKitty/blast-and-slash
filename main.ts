@@ -2803,7 +2803,7 @@ controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
                 if (!(inshop)) {
                     if (hitbox.tileKindAt(TileDirection.Center, assets.tile`myTile43`)) {
                         if (inhubworld) {
-                            story.showPlayerChoices("Level 1", "")
+                            story.showPlayerChoices("Level 1", "Level 2")
                             inhubworld = false
                             sprites.setDataNumber(hitbox, "levelsdoing", 20)
                             sprites.setDataNumber(hitbox, "levels-in", 0)
@@ -3555,20 +3555,24 @@ function upgreads () {
 }
 function turaningen () {
     for (let value of tiles.getTilesByType(assets.tile`myTile4`)) {
-        if (sprites.readDataNumber(hitbox, "levels-in") >= 15) {
-            if (Math.percentChance(60)) {
-                Put_tilemap_on_tilemap(value.column, value.row, randint(0, 3), random_gen2)
-            } else if (Math.percentChance(50)) {
-                Put_tilemap_on_tilemap(value.column, value.row, randint(0, 3), randomgen3)
+        if (sprites.readDataNumber(hitbox, "World") == 1) {
+            if (sprites.readDataNumber(hitbox, "levels-in") >= 15) {
+                if (Math.percentChance(60)) {
+                    Put_tilemap_on_tilemap(value.column, value.row, randint(0, 3), random_gen2)
+                } else if (Math.percentChance(50)) {
+                    Put_tilemap_on_tilemap(value.column, value.row, randint(0, 3), randomgen3)
+                } else {
+                    Put_tilemap_on_tilemap(value.column, value.row, randint(0, 10), random_gen01)
+                }
             } else {
-                Put_tilemap_on_tilemap(value.column, value.row, randint(0, 10), random_gen01)
+                if (sprites.readDataNumber(hitbox, "levels-in") >= 10 && Math.percentChance(30)) {
+                    Put_tilemap_on_tilemap(value.column, value.row, randint(0, 3), random_gen2)
+                } else {
+                    Put_tilemap_on_tilemap(value.column, value.row, randint(0, 10), random_gen01)
+                }
             }
-        } else {
-            if (sprites.readDataNumber(hitbox, "levels-in") >= 10 && Math.percentChance(30)) {
-                Put_tilemap_on_tilemap(value.column, value.row, randint(0, 3), random_gen2)
-            } else {
-                Put_tilemap_on_tilemap(value.column, value.row, randint(0, 10), random_gen01)
-            }
+        } else if (sprites.readDataNumber(hitbox, "World") == 2) {
+            tiles_on_map(value.column, value.row, randint(0, 0), random_gen_2_1)
         }
     }
     for (let value of tiles.getTilesByType(assets.tile`myTile37`)) {
@@ -4481,6 +4485,21 @@ function maincar_amations () {
     characterAnimations.rule(Predicate.MovingLeft, Predicate.Moving)
     )
 }
+function tiles_on_map (col: number, row: number, num: number, list: tiles.TileMapData[]) {
+    for (let y = 0; y <= 14; y++) {
+        for (let x = 0; x <= 7; x++) {
+            tiles.setTileAt(tiles.getTileLocation(y + col, x + row), tileUtil.getTileImage(list[num], tiles.getTileLocation(y, x)))
+            if (tileUtil.tileIsWall(list[num], tiles.getTileLocation(y, x))) {
+                tiles.setWallAt(tiles.getTileLocation(y + col, x + row), true)
+            } else {
+                tiles.setWallAt(tiles.getTileLocation(y + col, x + row), false)
+            }
+        }
+    }
+}
+scene.onOverlapTile(SpriteKind.Player, assets.tile`myTile90`, function (sprite, location) {
+    hitbox.vy = -200
+})
 function dropgoldheals (GoldHeal: string, mySprite: Sprite, num: number) {
     if (GoldHeal == "Chest") {
         Goldcoin = sprites.create(img`
@@ -4670,10 +4689,14 @@ function loadlevels () {
     levelsdisplay.setFlag(SpriteFlag.RelativeToCamera, true)
     levelsdisplay.setPosition(30, 230)
     levelsdisplay.setKind(SpriteKind.allevels)
-    if (sprites.readDataNumber(hitbox, "levels-in") == 20) {
-        tiles.setCurrentTilemap(tilemap`level54`)
-    } else {
-        tiles.setCurrentTilemap(tileUtil.cloneMap(dessertlevels[randint(0, 5)]))
+    if (sprites.readDataNumber(hitbox, "World") == 1) {
+        if (sprites.readDataNumber(hitbox, "levels-in") == 20) {
+            tiles.setCurrentTilemap(tilemap`level54`)
+        } else {
+            tiles.setCurrentTilemap(tileUtil.cloneMap(dessertlevels[randint(0, 5)]))
+        }
+    } else if (sprites.readDataNumber(hitbox, "World") == 2) {
+        tiles.setCurrentTilemap(tileUtil.cloneMap(lablevels[randint(0, 0)]))
     }
     sprites.destroyAllSpritesOfKind(SpriteKind.Enemy)
     sprites.destroyAllSpritesOfKind(SpriteKind.text)
@@ -5957,6 +5980,43 @@ scene.onOverlapTile(SpriteKind.Player, assets.tile`myTile68`, function (sprite, 
     sprites.setDataBoolean(hitbox, "Inlevel", false)
     loadlevels()
 })
+function levelload () {
+    dessertlevels = [
+    tilemap`level5`,
+    tilemap`level16`,
+    tilemap`level20`,
+    tilemap`level26`,
+    tilemap`level53`,
+    tilemap`level57`
+    ]
+    random_gen01 = [
+    tilemap`level8`,
+    tilemap`level9`,
+    tilemap`level11`,
+    tilemap`level12`,
+    tilemap`level13`,
+    tilemap`level14`,
+    tilemap`level15`,
+    tilemap`level18`,
+    tilemap`level19`,
+    tilemap`level21`,
+    tilemap`level25`
+    ]
+    random_gen2 = [
+    tilemap`level43`,
+    tilemap`level44`,
+    tilemap`level45`,
+    tilemap`level46`
+    ]
+    randomgen3 = [
+    tilemap`level49`,
+    tilemap`level50`,
+    tilemap`level51`,
+    tilemap`level52`
+    ]
+    lablevels = [tilemap`level59`]
+    random_gen_2_1 = [tilemap`level61`, tilemap`level62`]
+}
 controller.right.onEvent(ControllerButtonEvent.Pressed, function () {
     if (inshop) {
         if (sprites.readDataNumber(hitbox, "picked") == 2) {
@@ -6551,12 +6611,18 @@ let Baster_up: Image[] = []
 let BasterL: Image[] = []
 let blasterR: Image[] = []
 let plaster: Image[] = []
+let lablevels: tiles.TileMapData[] = []
+let dessertlevels: tiles.TileMapData[] = []
 let projectile: Sprite = null
 let myEffect: SpreadEffectData = null
 let projectile2: Sprite = null
 let Goldcoin: Sprite = null
 let statusbar: StatusBarSprite = null
 let rat: Sprite = null
+let random_gen_2_1: tiles.TileMapData[] = []
+let random_gen01: tiles.TileMapData[] = []
+let randomgen3: tiles.TileMapData[] = []
+let random_gen2: tiles.TileMapData[] = []
 let shop: Sprite = null
 let backgroundtext: Sprite = null
 let myEffect2: SpreadEffectData = null
@@ -6591,10 +6657,6 @@ let dash = false
 let can_be_in_menu = false
 let damgecooldown = false
 let playtrack = 0
-let randomgen3: tiles.TileMapData[] = []
-let random_gen2: tiles.TileMapData[] = []
-let random_gen01: tiles.TileMapData[] = []
-let dessertlevels: tiles.TileMapData[] = []
 let inhubworld = false
 let particalson = false
 if (false) {
@@ -6607,39 +6669,7 @@ namespace userconfig {
 music.setVolume(50)
 particalson = true
 inhubworld = true
-dessertlevels = [
-tilemap`level5`,
-tilemap`level16`,
-tilemap`level20`,
-tilemap`level26`,
-tilemap`level53`,
-tilemap`level57`
-]
-random_gen01 = [
-tilemap`level8`,
-tilemap`level9`,
-tilemap`level11`,
-tilemap`level12`,
-tilemap`level13`,
-tilemap`level14`,
-tilemap`level15`,
-tilemap`level18`,
-tilemap`level19`,
-tilemap`level21`,
-tilemap`level25`
-]
-random_gen2 = [
-tilemap`level43`,
-tilemap`level44`,
-tilemap`level45`,
-tilemap`level46`
-]
-randomgen3 = [
-tilemap`level49`,
-tilemap`level50`,
-tilemap`level51`,
-tilemap`level52`
-]
+levelload()
 Zoom.SetZoomFilter(2, Mode.Center)
 playtrack = 1
 blasterloading()
@@ -6871,10 +6901,11 @@ for (let value of listofupgrades) {
     sprites.setDataNumber(hitbox, value, 0)
 }
 sprites.setDataBoolean(hitbox, "Inlevel", false)
+blockSettings.writeNumber("Bossgun", 1)
 if (blockSettings.exists("main")) {
     main_lobby()
 } else {
-    blockSettings.writeNumber("Wepen", 1)
+    blockSettings.writeNumber("Wepen", 2)
 }
 if (false) {
     sprites.setDataNumber(hitbox, "More-slide-speed", 5)
