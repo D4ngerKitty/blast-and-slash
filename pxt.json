@@ -19,7 +19,8 @@
         "settings-blocks": "github:microsoft/pxt-settings-blocks#v1.0.0",
         "Menu Theme": "pub:75311-91892-45251-32159",
         "arcade-story": "github:microsoft/arcade-storytelling#v1.0.3",
-        "arcade-mini-menu": "github:riknoll/arcade-mini-menu#v0.0.1"
+        "arcade-mini-menu": "github:riknoll/arcade-mini-menu#v0.0.1",
+        "arcade-moving-platforms": "github:riknoll/arcade-moving-platforms#v0.0.15"
     },
     "files": [
         "main.blocks",
